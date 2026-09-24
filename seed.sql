@@ -78,3 +78,21 @@ insert into project_memory(key,value) values
 ('data_policy', '{"paid_data_required":false,"use_multiple_permitted_public_sources":true,"calculate_own_market_value":true,"never_present_demo_data_as_live":true}'),
 ('ui_v2', '{"status":"deployed","mobile_first":true,"watchlist":true,"filters":true,"reference_pages":true}')
 on conflict (key) do update set value=excluded.value, updated_at=now();
+
+insert into source_registry(source_key,name,source_type,base_url,enabled,usage_mode,notes) values
+('rolex_official','Rolex Official','official','https://www.rolex.com',false,'metadata','Official catalog/reference metadata only; enable adapter after source terms are reviewed.'),
+('patek_official','Patek Philippe Official','official','https://www.patek.com',false,'metadata','Official catalog/reference metadata only; enable adapter after source terms are reviewed.'),
+('ap_official','Audemars Piguet Official','official','https://www.audemarspiguet.com',false,'metadata','Official catalog/reference metadata only; enable adapter after source terms are reviewed.'),
+('cartier_official','Cartier Official','official','https://www.cartier.com',false,'metadata','Official catalog/reference metadata only; enable adapter after source terms are reviewed.'),
+('omega_official','Omega Official','official','https://www.omegawatches.com',false,'metadata','Official catalog/reference metadata only; enable adapter after source terms are reviewed.'),
+('manual_market_seed','WatchValue Curated Market Seed','marketplace',null,true,'demo','Temporary demo market observations only. Replace with permitted live data adapters.')
+on conflict(source_key) do update set name=excluded.name,source_type=excluded.source_type,base_url=excluded.base_url,
+enabled=excluded.enabled,usage_mode=excluded.usage_mode,notes=excluded.notes,updated_at=now();
+
+insert into agent_tasks(task_type,payload,status,run_after)
+select 'catalog_quality_scan','{"scope":"all"}'::jsonb,'queued',now()
+where not exists(select 1 from agent_tasks where task_type='catalog_quality_scan' and status in ('queued','running'));
+
+insert into agent_tasks(task_type,payload,status,run_after)
+select 'source_terms_review','{"scope":"official_sources"}'::jsonb,'queued',now()
+where not exists(select 1 from agent_tasks where task_type='source_terms_review' and status in ('queued','running'));
