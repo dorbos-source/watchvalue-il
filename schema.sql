@@ -19,9 +19,12 @@ create table if not exists watches (
   dial text,
   movement text,
   limited_quantity int,
+  image_url text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table watches add column if not exists image_url text;
 
 create index if not exists watches_brand_idx on watches(brand_id);
 create index if not exists watches_reference_idx on watches(reference);
@@ -36,12 +39,31 @@ create table if not exists price_snapshots (
   dealer_buy_usd numeric(14,2),
   dealer_ask_usd numeric(14,2),
   private_sale_usd numeric(14,2),
+  market_value_ils numeric(14,2),
+  retail_price_ils numeric(14,2),
+  dealer_buy_ils numeric(14,2),
+  dealer_ask_ils numeric(14,2),
+  private_sale_ils numeric(14,2),
+  change_12m numeric(8,2),
+  liquidity_score numeric(5,2),
+  liquidity_label text,
   confidence numeric(5,2),
   listing_count int,
   source_count int,
   methodology_version text,
+  is_demo boolean not null default false,
   unique(watch_id, as_of)
 );
+
+alter table price_snapshots add column if not exists market_value_ils numeric(14,2);
+alter table price_snapshots add column if not exists retail_price_ils numeric(14,2);
+alter table price_snapshots add column if not exists dealer_buy_ils numeric(14,2);
+alter table price_snapshots add column if not exists dealer_ask_ils numeric(14,2);
+alter table price_snapshots add column if not exists private_sale_ils numeric(14,2);
+alter table price_snapshots add column if not exists change_12m numeric(8,2);
+alter table price_snapshots add column if not exists liquidity_score numeric(5,2);
+alter table price_snapshots add column if not exists liquidity_label text;
+alter table price_snapshots add column if not exists is_demo boolean not null default false;
 
 create index if not exists price_snapshots_watch_time_idx on price_snapshots(watch_id, as_of desc);
 
