@@ -9,7 +9,6 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const port = process.env.PORT || 3000;
-
 const pool = process.env.DATABASE_URL ? new Pool({ connectionString: process.env.DATABASE_URL }) : null;
 
 async function initializeDatabase() {
@@ -22,7 +21,7 @@ async function initializeDatabase() {
 }
 
 app.use(express.json());
-app.use(express.static(__dirname));
+app.use(express.static(__dirname,{etag:true,maxAge:'5m'}));
 
 app.get('/health', async (_req, res) => {
   try {
@@ -46,10 +45,8 @@ app.get('/api/brands', async (_req, res) => {
   if (!pool) return res.json([]);
   const { rows } = await pool.query(`
     select b.id, b.slug, b.name, count(w.id)::int as watch_count
-    from brands b
-    left join watches w on w.brand_id = b.id
-    group by b.id
-    order by b.name
+    from brands b left join watches w on w.brand_id=b.id
+    group by b.id order by b.name
   `);
   res.json(rows);
 });
@@ -58,41 +55,49 @@ app.get('/api/watches', async (req, res) => {
   if (!pool) return res.json([]);
   const q = String(req.query.q || '').trim();
   const { rows } = await pool.query(`
-    select w.id, w.reference, w.model, w.collection, w.status,
-           w.production_start, w.production_end,
-           b.name as brand,
-           p.market_value_usd, p.retail_price_usd, p.currency, p.as_of
+    select w.id,w.reference,w.model,w.collection,w.status,w.production_start,w.production_end,
+           w.case_size_mm,w.material,w.dial,w.movement,w.image_url,b.name as brand,
+           p.market_value_ils,p.retail_price_ils,p.dealer_buy_ils,p.dealer_ask_ils,p.private_sale_ils,
+           p.change_12m,p.liquidity_score,p.liquidity_label,p.confidence,p.listing_count,p.source_count,
+           p.is_demo,p.as_of
     from watches w
-    join brands b on b.id = w.brand_id
+    join brands b on b.id=w.brand_id
     left join lateral (
-      select market_value_usd, retail_price_usd, currency, as_of
-      from price_snapshots ps
-      where ps.watch_id = w.id
-      order by as_of desc
-      limit 1
+      select * from price_snapshots ps where ps.watch_id=w.id order by as_of desc limit 1
     ) p on true
-    where ($1 = '' or w.reference ilike '%' || $1 || '%' or w.model ilike '%' || $1 || '%' or b.name ilike '%' || $1 || '%')
-    order by b.name, w.collection, w.reference
-    limit 100
-  `, [q]);
+    where ($1='' or w.reference ilike '%'||$1||'%' or w.model ilike '%'||$1||'%' or
+           w.collection ilike '%'||$1||'%' or b.name ilike '%'||$1||'%')
+    order by coalesce(p.liquidity_score,0) desc,b.name,w.collection,w.reference
+    limit 500
+  `,[q]);
   res.json(rows);
+});
+
+app.get('/api/watch/:reference', async (req,res)=>{
+  if(!pool) return res.status(404).json({error:'Database unavailable'});
+  const {rows}=await pool.query(`
+    select w.*,b.name as brand,
+           p.market_value_ils,p.retail_price_ils,p.dealer_buy_ils,p.dealer_ask_ils,p.private_sale_ils,
+           p.change_12m,p.liquidity_score,p.liquidity_label,p.confidence,p.listing_count,p.source_count,p.is_demo,p.as_of
+    from watches w join brands b on b.id=w.brand_id
+    left join lateral (select * from price_snapshots ps where ps.watch_id=w.id order by as_of desc limit 1) p on true
+    where lower(w.reference)=lower($1) limit 1
+  `,[req.params.reference]);
+  if(!rows.length) return res.status(404).json({error:'Reference not found'});
+  res.json(rows[0]);
 });
 
 app.get('/api/project-memory', async (_req, res) => {
   if (!pool) return res.json([]);
-  const { rows } = await pool.query('select key, value, updated_at from project_memory order by key');
+  const { rows } = await pool.query('select key,value,updated_at from project_memory order by key');
   res.json(rows);
 });
 
 app.get('*', (_req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 
-initializeDatabase()
-  .then(() => {
-    app.listen(port, '0.0.0.0', () => {
-      console.log(`WatchValue IL listening on ${port}`);
-    });
-  })
-  .catch((error) => {
-    console.error('Database initialization failed:', error);
-    process.exit(1);
-  });
+initializeDatabase().then(()=>{
+  app.listen(port,'0.0.0.0',()=>console.log(`WatchValue IL listening on ${port}`));
+}).catch(error=>{
+  console.error('Database initialization failed:',error);
+  process.exit(1);
+});
