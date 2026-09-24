@@ -1,4 +1,5 @@
 import pg from 'pg';
+import fs from 'fs/promises';
 
 const { Pool } = pg;
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -52,6 +53,46 @@ async function catalogQualityScan(){
   });
 }
 
+async function syncCoreCatalog(){
+  return logRun('catalog_sync',async()=>{
+    const rows=JSON.parse(await fs.readFile(new URL('./catalog/core-references.json',import.meta.url),'utf8'));
+    let inserted=0,updated=0;
+    const client=await pool.connect();
+    try{
+      await client.query('begin');
+      for(const row of rows){
+        const slug=row.brand.toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+        const {rows:[brand]}=await client.query(
+          `insert into brands(slug,name) values($1,$2)
+           on conflict(name) do update set name=excluded.name returning id`,[slug,row.brand]
+        );
+        const exists=await client.query('select id from watches where lower(reference)=lower($1)',[row.reference]);
+        await client.query(`
+          insert into watches(brand_id,collection,model,reference,status,production_start,production_end,case_size_mm,material,dial,updated_at)
+          values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,now())
+          on conflict(reference) do update set
+            brand_id=excluded.brand_id,collection=excluded.collection,model=excluded.model,status=excluded.status,
+            production_start=excluded.production_start,production_end=excluded.production_end,case_size_mm=excluded.case_size_mm,
+            material=excluded.material,dial=excluded.dial,updated_at=now()
+        `,[
+          brand.id,row.collection||null,row.model,row.reference,
+          String(row.status||'current').toLowerCase().includes('dis')?'discontinued':
+          String(row.status||'current').toLowerCase().includes('limit')?'limited':'current',
+          row.production_start||null,row.production_end||null,row.case_size_mm||null,row.material||null,row.dial||null
+        ]);
+        exists.rowCount?updated++:inserted++;
+      }
+      await client.query('commit');
+      return {seen:rows.length,inserted,updated};
+    }catch(error){
+      await client.query('rollback');
+      throw error;
+    }finally{
+      client.release();
+    }
+  });
+}
+
 async function processQueue(){
   const {rows}=await pool.query(`
     select id,task_type,payload from agent_tasks
@@ -78,6 +119,7 @@ async function processQueue(){
 
 async function main(){
   console.log('WatchValue worker starting');
+  await syncCoreCatalog();
   const processed=await processQueue();
   await catalogQualityScan();
   console.log('WatchValue worker completed', {processed});
