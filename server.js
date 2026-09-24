@@ -1,6 +1,7 @@
 import express from 'express';
 import pg from 'pg';
 import path from 'path';
+import fs from 'fs/promises';
 import { fileURLToPath } from 'url';
 
 const { Pool } = pg;
@@ -10,6 +11,15 @@ const __dirname = path.dirname(__filename);
 const port = process.env.PORT || 3000;
 
 const pool = process.env.DATABASE_URL ? new Pool({ connectionString: process.env.DATABASE_URL }) : null;
+
+async function initializeDatabase() {
+  if (!pool) return;
+  const schema = await fs.readFile(path.join(__dirname, 'schema.sql'), 'utf8');
+  const seed = await fs.readFile(path.join(__dirname, 'seed.sql'), 'utf8');
+  await pool.query(schema);
+  await pool.query(seed);
+  console.log('WatchValue IL database initialized');
+}
 
 app.use(express.json());
 app.use(express.static(__dirname));
@@ -76,6 +86,13 @@ app.get('/api/project-memory', async (_req, res) => {
 
 app.get('*', (_req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 
-app.listen(port, '0.0.0.0', () => {
-  console.log(`WatchValue IL listening on ${port}`);
-});
+initializeDatabase()
+  .then(() => {
+    app.listen(port, '0.0.0.0', () => {
+      console.log(`WatchValue IL listening on ${port}`);
+    });
+  })
+  .catch((error) => {
+    console.error('Database initialization failed:', error);
+    process.exit(1);
+  });
