@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WatchValue IL — מחירון שעוני היוקרה של ישראל</title>
+  <meta name="description" content="מחירי שוק עדכניים, היסטוריית מחירים ונתוני סחירות לשעוני יוקרה בישראל." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700&family=DM+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="#home" aria-label="WatchValue IL">
+        <span class="brand-mark">WV</span>
+        <span class="brand-copy"><strong>WatchValue</strong><small>ISRAEL</small></span>
+      </a>
+      <nav class="nav">
+        <a href="#market">מחירון</a>
+        <a href="#brands">מותגים</a>
+        <a href="#discontinued">Discontinued</a>
+        <a href="#news">חדשות</a>
+      </nav>
+      <button class="ghost-btn" data-open-pricing>7 ימים חינם</button>
+    </div>
+  </header>
+
+  <main id="app"></main>
+
+  <div class="modal-backdrop" id="pricingModal" hidden>
+    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="pricingTitle">
+      <button class="modal-close" data-close-pricing aria-label="סגירה">×</button>
+      <div class="eyebrow">WATCHVALUE PREMIUM</div>
+      <h2 id="pricingTitle">7 ימים חינם. אחר כך בוחרים.</h2>
+      <p class="muted">מחירים, גרפים, היסטוריה, Watchlist, התראות ומעקב אחרי תיק השעונים.</p>
+      <div class="plans">
+        <article class="plan-card">
+          <span class="plan-label">חודשי</span>
+          <div class="plan-price"><b>$14.99</b><span>/ חודש</span></div>
+          <button class="primary-btn full">התחל 7 ימים חינם</button>
+        </article>
+        <article class="plan-card featured">
+          <span class="save-badge">חוסכים כ־17%</span>
+          <span class="plan-label">שנתי</span>
+          <div class="plan-price"><b>$149</b><span>/ שנה</span></div>
+          <button class="primary-btn full">התחל 7 ימים חינם</button>
+        </article>
+      </div>
+      <small class="fineprint">גרסת MVP — סליקה אמיתית תחובר בשלב הבא.</small>
+    </section>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
