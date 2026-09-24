@@ -1,4 +1,4 @@
-const watches = [
+const demoWatches = [
   {brand:'Rolex',collection:'GMT-Master II',model:'Pepsi',ref:'126710BLRO',market:72500,retail:46500,change:4.8,status:'Current',years:'2018–היום',size:'40mm',material:'Oystersteel',dial:'Black',liquidity:'Very High',vol:94},
   {brand:'Rolex',collection:'Submariner Date',model:'Black',ref:'126610LN',market:55800,retail:42300,change:2.1,status:'Current',years:'2020–היום',size:'41mm',material:'Oystersteel',dial:'Black',liquidity:'Very High',vol:98},
   {brand:'Rolex',collection:'Cosmograph Daytona',model:'Panda',ref:'126500LN',market:109500,retail:59100,change:6.2,status:'Current',years:'2023–היום',size:'40mm',material:'Oystersteel',dial:'White',liquidity:'Very High',vol:96},
@@ -20,6 +20,43 @@ const watches = [
   {brand:'Breitling',collection:'Navitimer B01',model:'Chronograph 43',ref:'AB0138211B1P1',market:22300,retail:35200,change:-0.8,status:'Current',years:'2022–היום',size:'43mm',material:'Steel',dial:'Black',liquidity:'Medium',vol:63},
   {brand:'F.P. Journe',collection:'Chronomètre Bleu',model:'Tantalum',ref:'CB',market:315000,retail:null,change:5.4,status:'Current',years:'2009–היום',size:'39mm',material:'Tantalum',dial:'Blue',liquidity:'Medium',vol:48}
 ];
+let watches=[...demoWatches];
+
+async function loadDatabaseCatalog(){
+  try{
+    const res=await fetch('/api/watches',{headers:{'Accept':'application/json'}});
+    if(!res.ok) return;
+    const rows=await res.json();
+    if(!Array.isArray(rows)||!rows.length) return;
+    watches=rows.map(r=>({
+      brand:r.brand,
+      collection:r.collection||'',
+      model:r.model||'',
+      ref:r.reference,
+      market:Number(r.market_value_ils)||0,
+      retail:r.retail_price_ils==null?null:Number(r.retail_price_ils),
+      dealerBuy:r.dealer_buy_ils==null?null:Number(r.dealer_buy_ils),
+      dealerAsk:r.dealer_ask_ils==null?null:Number(r.dealer_ask_ils),
+      privateSale:r.private_sale_ils==null?null:Number(r.private_sale_ils),
+      change:Number(r.change_12m)||0,
+      status:r.status==='discontinued'?'Discontinued':r.status==='limited'?'Limited':'Current',
+      years:r.production_start?(String(r.production_start)+'–'+(r.production_end||'היום')):'—',
+      size:r.case_size_mm?(String(r.case_size_mm).replace(/\.00$/,'')+'mm'):'—',
+      material:r.material||'—',
+      dial:r.dial||'—',
+      liquidity:r.liquidity_label||'—',
+      vol:Number(r.liquidity_score)||0,
+      confidence:r.confidence==null?null:Number(r.confidence),
+      listingCount:r.listing_count==null?0:Number(r.listing_count),
+      sourceCount:r.source_count==null?0:Number(r.source_count),
+      isDemo:Boolean(r.is_demo),
+      asOf:r.as_of||null,
+      imageUrl:r.image_url||null
+    }));
+  }catch(err){
+    console.warn('Catalog API unavailable, using local fallback',err);
+  }
+}
 
 const brandMeta = [
  ['Rolex','The Crown'],['Patek Philippe','Geneva'],['Audemars Piguet','Le Brassus'],['Cartier','Paris'],
@@ -248,4 +285,4 @@ function route(){
 }
 window.addEventListener('hashchange',route);
 bindGlobal();
-route();
+loadDatabaseCatalog().finally(route);
