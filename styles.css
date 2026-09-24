@@ -1,3 +1,4 @@
+.modal-backdrop[hidden]{display:none!important;}
 :root{
   --bg:#07100d;--panel:#0d1713;--panel2:#111d18;--line:#23312b;--text:#f4f7f5;--muted:#98a7a0;
   --green:#29d889;--green2:#0f8f5b;--gold:#d5b76a;--danger:#ff6b72;--shadow:0 24px 80px rgba(0,0,0,.35)
