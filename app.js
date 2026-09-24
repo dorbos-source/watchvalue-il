@@ -63,9 +63,24 @@ function bindHome(){
  document.querySelectorAll('[data-brand]').forEach(el=>el.addEventListener('click',()=>{ const term=el.dataset.brand; app.innerHTML=`${marketSection(term)}${brandsSection()}<div class="demo-note">סינון לפי ${term}</div>`; bindHome(); window.scrollTo(0,0); }));
  const form=document.getElementById('searchForm'); if(form) form.addEventListener('submit',e=>{e.preventDefault(); const q=document.getElementById('searchInput').value.trim(); const exact=watches.find(w=>w.ref.toLowerCase()===q.toLowerCase()); if(exact) location.hash='watch/'+exact.ref; else { app.innerHTML=`${marketSection(q)}${brandsSection()}<div class="demo-note">תוצאות חיפוש: ${q || 'הכל'}</div>`; bindHome(); window.scrollTo(0,0);} });
 }
+function openPricing(){
+ const modal=document.getElementById('pricingModal');
+ if(!modal) return;
+ modal.style.display='grid';
+ modal.setAttribute('aria-hidden','false');
+}
+function closePricing(){
+ const modal=document.getElementById('pricingModal');
+ if(!modal) return;
+ modal.style.display='none';
+ modal.setAttribute('aria-hidden','true');
+}
 function bindGlobal(){
- document.querySelectorAll('[data-open-pricing]').forEach(b=>b.addEventListener('click',()=>document.getElementById('pricingModal').hidden=false));
- document.querySelectorAll('[data-close-pricing]').forEach(b=>b.addEventListener('click',()=>document.getElementById('pricingModal').hidden=true));
+ const modal=document.getElementById('pricingModal');
+ if(modal && modal.getAttribute('aria-hidden')==='true') modal.style.display='none';
+ document.querySelectorAll('[data-open-pricing]').forEach(b=>b.addEventListener('click',openPricing));
+ document.querySelectorAll('[data-close-pricing]').forEach(b=>b.addEventListener('click',closePricing));
+ if(modal) modal.addEventListener('click',e=>{ if(e.target===modal) closePricing(); });
 }
 function router(){ const h=location.hash.replace('#','')||'home'; if(h.startsWith('watch/')) modelPage(decodeURIComponent(h.split('/')[1])); else home(); }
 window.addEventListener('hashchange',router); bindGlobal(); router();
