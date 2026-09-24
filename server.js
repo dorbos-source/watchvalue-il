@@ -93,6 +93,25 @@ app.get('/api/project-memory', async (_req, res) => {
   res.json(rows);
 });
 
+app.get('/api/system/status', async (_req,res)=>{
+  if(!pool) return res.status(503).json({ok:false});
+  const [catalog,prices,sources,runs,tasks]=await Promise.all([
+    pool.query("select count(*)::int as watches,count(distinct brand_id)::int as brands from watches"),
+    pool.query("select count(*)::int as snapshots,count(*) filter(where is_demo)::int as demo_snapshots,max(as_of) as latest_price_at from price_snapshots"),
+    pool.query("select count(*)::int as sources,count(*) filter(where enabled)::int as enabled_sources from source_registry"),
+    pool.query("select id,job_type,status,started_at,finished_at,records_seen,records_written,error from ingestion_runs order by started_at desc limit 5"),
+    pool.query("select status,count(*)::int as count from agent_tasks group by status order by status")
+  ]);
+  res.json({
+    ok:true,
+    catalog:catalog.rows[0],
+    prices:prices.rows[0],
+    sources:sources.rows[0],
+    recentRuns:runs.rows,
+    tasks:tasks.rows
+  });
+});
+
 app.get('*', (_req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 
 initializeDatabase().then(()=>{
