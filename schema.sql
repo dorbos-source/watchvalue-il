@@ -132,3 +132,32 @@ create table if not exists subscriptions (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+create table if not exists source_registry (
+  id bigserial primary key,
+  source_key text unique not null,
+  name text not null,
+  source_type text not null check (source_type in ('official','marketplace','auction','dealer','community','fx','news')),
+  base_url text,
+  enabled boolean not null default false,
+  usage_mode text not null default 'research',
+  notes text,
+  last_checked_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists ingestion_runs (
+  id bigserial primary key,
+  source_key text references source_registry(source_key) on delete set null,
+  job_type text not null,
+  status text not null check (status in ('running','success','failed','skipped')),
+  started_at timestamptz not null default now(),
+  finished_at timestamptz,
+  records_seen int not null default 0,
+  records_written int not null default 0,
+  details jsonb not null default '{}'::jsonb,
+  error text
+);
+
+create index if not exists ingestion_runs_started_idx on ingestion_runs(started_at desc);
