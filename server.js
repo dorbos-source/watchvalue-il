@@ -55,8 +55,8 @@ app.get('/api/watches', async (req, res) => {
   if (!pool) return res.json([]);
   const q = String(req.query.q || '').trim();
   const { rows } = await pool.query(`
-    select w.id,w.reference,w.model,w.collection,w.status,w.production_start,w.production_end,
-           w.case_size_mm,w.material,w.dial,w.movement,w.image_url,b.name as brand,
+    select w.id,w.reference,w.model,w.collection,w.official_model_name,w.nickname,w.generation,w.bracelet,w.bezel,w.variant_key,
+           w.status,w.production_start,w.production_end,w.case_size_mm,w.material,w.dial,w.movement,w.image_url,b.name as brand,
            p.market_value_ils,p.retail_price_ils,p.dealer_buy_ils,p.dealer_ask_ils,p.private_sale_ils,
            p.change_12m,p.liquidity_score,p.liquidity_label,p.confidence,p.listing_count,p.source_count,
            p.is_demo,p.as_of
@@ -66,7 +66,9 @@ app.get('/api/watches', async (req, res) => {
       select * from price_snapshots ps where ps.watch_id=w.id order by as_of desc limit 1
     ) p on true
     where ($1='' or w.reference ilike '%'||$1||'%' or w.model ilike '%'||$1||'%' or
-           w.collection ilike '%'||$1||'%' or b.name ilike '%'||$1||'%')
+           w.collection ilike '%'||$1||'%' or coalesce(w.official_model_name,'') ilike '%'||$1||'%' or
+           coalesce(w.nickname,'') ilike '%'||$1||'%' or coalesce(w.generation,'') ilike '%'||$1||'%' or
+           coalesce(w.bracelet,'') ilike '%'||$1||'%' or b.name ilike '%'||$1||'%')
     order by coalesce(p.liquidity_score,0) desc,b.name,w.collection,w.reference
     limit 500
   `,[q]);
