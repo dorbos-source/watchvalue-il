@@ -26,6 +26,17 @@ create table if not exists watches (
 
 alter table watches add column if not exists image_url text;
 
+alter table watches add column if not exists official_model_name text;
+alter table watches add column if not exists nickname text;
+alter table watches add column if not exists generation text;
+alter table watches add column if not exists bracelet text;
+alter table watches add column if not exists bezel text;
+alter table watches add column if not exists variant_key text;
+create index if not exists watches_collection_idx on watches(collection);
+create index if not exists watches_generation_idx on watches(generation);
+create index if not exists watches_variant_key_idx on watches(variant_key);
+
+
 create index if not exists watches_brand_idx on watches(brand_id);
 create index if not exists watches_reference_idx on watches(reference);
 
