@@ -310,11 +310,35 @@ function bindGlobal(){
  document.querySelector('[data-close-search]')?.addEventListener('click',closeSearch);
  document.getElementById('globalSearch')?.addEventListener('click',e=>{if(e.target.id==='globalSearch')closeSearch();});
  const input=document.getElementById('globalSearchInput'); if(input)input.oninput=e=>renderSearchResults(e.target.value);
+ const imageButton=document.getElementById('imageSearchButton');
+ const imageInput=document.getElementById('imageSearchInput');
+ if(imageButton&&imageInput){
+   imageButton.onclick=()=>imageInput.click();
+   imageInput.onchange=e=>handleImageSearch(e.target.files?.[0]);
+ }
 }
 function openPricing(){const m=document.getElementById('pricingModal');m.style.display='grid';m.setAttribute('aria-hidden','false');}
 function closePricing(){const m=document.getElementById('pricingModal');m.style.display='none';m.setAttribute('aria-hidden','true');}
 function openSearch(){const m=document.getElementById('globalSearch');m.style.display='grid';m.setAttribute('aria-hidden','false');setTimeout(()=>document.getElementById('globalSearchInput')?.focus(),40);renderSearchResults('');}
 function closeSearch(){const m=document.getElementById('globalSearch');m.style.display='none';m.setAttribute('aria-hidden','true');}
+async function handleImageSearch(file){
+ if(!file)return;
+ const preview=document.getElementById('imageSearchPreview');
+ const results=document.getElementById('globalSearchResults');
+ if(preview){preview.hidden=false;preview.innerHTML='<img alt="תמונת שעון"><div><b>מנתח את התמונה…</b><small>ננסה לזהות מותג, משפחה ו-Reference אפשרי.</small></div>';preview.querySelector('img').src=URL.createObjectURL(file);}
+ if(results)results.innerHTML='<div class="search-loading">חיפוש התאמות בקטלוג…</div>';
+ const form=new FormData();form.append('image',file);
+ try{
+   const res=await fetch('/api/image-search',{method:'POST',body:form});
+   const data=await res.json();
+   if(!res.ok)throw new Error(data.error||'image search unavailable');
+   const matches=(data.matches||[]).map(m=>watches.find(w=>w.ref===m.reference)).filter(Boolean);
+   if(results)results.innerHTML=matches.length?matches.map(w=>`<button data-search-watch="${w.ref}"><span><b>${w.brand}</b><small>${w.officialModel||w.collection} ${w.nickname||w.model}</small></span><em>${w.ref}</em></button>`).join(''):'<div class="empty-state"><b>לא נמצאה התאמה בטוחה</b><span>נסה צילום ישר וברור של חזית השעון. לא נציג Reference מדויק אם הביטחון נמוך.</span></div>';
+   results?.querySelectorAll('[data-search-watch]').forEach(x=>x.onclick=()=>{closeSearch();location.hash='#/watch/'+encodeURIComponent(x.dataset.searchWatch);});
+ }catch(err){
+   if(results)results.innerHTML='<div class="empty-state"><b>חיפוש התמונה בהכנה</b><span>העלאת התמונה כבר פעילה. מנוע הזיהוי יחובר לשכבת ה-AI לפני שנציג זיהוי אמיתי.</span></div>';
+ }
+}
 function renderSearchResults(q){
  const el=document.getElementById('globalSearchResults'); if(!el)return;
  const data=q?watches.filter(w=>[w.brand,w.collection,w.officialModel,w.model,w.nickname,w.generation,w.ref,w.bracelet,w.bezel].join(' ').toLowerCase().includes(q.toLowerCase())).slice(0,8):watches.slice(0,6);
