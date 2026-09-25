@@ -40,6 +40,8 @@ async function loadDatabaseCatalog(){
       privateSale:r.private_sale_ils==null?null:Number(r.private_sale_ils),
       change:Number(r.change_12m)||0,
       status:r.status==='discontinued'?'Discontinued':r.status==='limited'?'Limited':'Current',
+      productionStart:r.production_start==null?null:Number(r.production_start),
+      productionEnd:r.production_end==null?null:Number(r.production_end),
       years:r.production_start?(String(r.production_start)+'–'+(r.production_end||'היום')):'—',
       size:r.case_size_mm?(String(r.case_size_mm).replace(/\.00$/,'')+'mm'):'—',
       material:r.material||'—',
@@ -69,7 +71,7 @@ const app = document.getElementById('app');
 const fmt = n => n ? new Intl.NumberFormat('he-IL',{style:'currency',currency:'ILS',maximumFractionDigits:0}).format(n) : '—';
 const fmtPlain = n => new Intl.NumberFormat('he-IL',{maximumFractionDigits:0}).format(n);
 const watchKey = w => w.ref;
-let marketState={q:'',brand:'All',status:'All',sort:'popular'};
+let marketState={q:'',brand:'All',collection:'All',model:'All',year:'All',status:'All',material:'All',size:'All',sort:'popular'};
 
 function miniChart(change=1, id='g'){
  const up=change>=0;
@@ -158,19 +160,43 @@ function marketRow(w){
  </article>`;
 }
 
+function uniqSorted(values){return [...new Set(values.filter(v=>v!==null&&v!==undefined&&v!==''&&v!=='—'))].sort((a,b)=>String(a).localeCompare(String(b),'en',{numeric:true}));}
+function optionList(values,current,label='הכל'){return '<option value="All">'+label+'</option>'+values.map(v=>'<option value="'+escapeHtml(String(v))+'" '+(String(current)===String(v)?'selected':'')+'>'+escapeHtml(String(v))+'</option>').join('');}
+function filterBase(exclude=''){
+ let arr=[...watches];
+ const s=marketState;
+ if(exclude!=='q'&&s.q){const q=s.q.toLowerCase();arr=arr.filter(w=>[w.brand,w.collection,w.model,w.ref,w.years,w.material,w.size,w.dial].join(' ').toLowerCase().includes(q));}
+ if(exclude!=='brand'&&s.brand!=='All')arr=arr.filter(w=>w.brand===s.brand);
+ if(exclude!=='collection'&&s.collection!=='All')arr=arr.filter(w=>w.collection===s.collection);
+ if(exclude!=='model'&&s.model!=='All')arr=arr.filter(w=>w.model===s.model);
+ if(exclude!=='year'&&s.year!=='All'){const y=Number(s.year);arr=arr.filter(w=>(w.productionStart||0)<=y&&(!w.productionEnd||w.productionEnd>=y));}
+ if(exclude!=='status'&&s.status!=='All')arr=arr.filter(w=>w.status===s.status);
+ if(exclude!=='material'&&s.material!=='All')arr=arr.filter(w=>w.material===s.material);
+ if(exclude!=='size'&&s.size!=='All')arr=arr.filter(w=>w.size===s.size);
+ return arr;
+}
 function filtersHtml(){
- return `<div class="filters">
-   <div class="market-search"><span>⌕</span><input id="marketSearch" value="${escapeHtml(marketState.q)}" placeholder="חיפוש לפי Reference, מותג או דגם"></div>
-   <select id="brandFilter"><option value="All">כל המותגים</option>${brandMeta.map(b=>`<option ${marketState.brand===b[0]?'selected':''}>${b[0]}</option>`).join('')}</select>
-   <select id="statusFilter"><option value="All">כל הסטטוסים</option><option value="Current" ${marketState.status==='Current'?'selected':''}>בייצור</option><option value="Discontinued" ${marketState.status==='Discontinued'?'selected':''}>הופסק ייצור</option></select>
+ const collections=uniqSorted(filterBase('collection').map(w=>w.collection));
+ const models=uniqSorted(filterBase('model').map(w=>w.model));
+ const materials=uniqSorted(filterBase('material').map(w=>w.material));
+ const sizes=uniqSorted(filterBase('size').map(w=>w.size));
+ const yearRows=filterBase('year').flatMap(w=>{if(!w.productionStart)return[];const end=w.productionEnd||new Date().getFullYear();const a=[];for(let y=w.productionStart;y<=end;y++)a.push(y);return a;});
+ const years=uniqSorted(yearRows).sort((a,b)=>b-a);
+ return `<div class="filters advanced-filters">
+   <div class="market-search filter-search"><span>⌕</span><input id="marketSearch" value="${escapeHtml(marketState.q)}" placeholder="Reference מדויק, דגם, כינוי או שנתון"></div>
+   <select id="brandFilter">${optionList(uniqSorted(watches.map(w=>w.brand)),marketState.brand,'כל המותגים')}</select>
+   <select id="collectionFilter">${optionList(collections,marketState.collection,'כל הקולקציות')}</select>
+   <select id="modelFilter">${optionList(models,marketState.model,'כל המודלים')}</select>
+   <select id="yearFilter">${optionList(years,marketState.year,'כל השנתונים')}</select>
+   <select id="statusFilter"><option value="All">כל הסטטוסים</option><option value="Current" ${marketState.status==='Current'?'selected':''}>בייצור</option><option value="Discontinued" ${marketState.status==='Discontinued'?'selected':''}>הופסק ייצור</option><option value="Limited" ${marketState.status==='Limited'?'selected':''}>מהדורה מוגבלת</option></select>
+   <select id="materialFilter">${optionList(materials,marketState.material,'כל החומרים')}</select>
+   <select id="sizeFilter">${optionList(sizes,marketState.size,'כל הקטרים')}</select>
    <select id="sortFilter"><option value="popular">הכי סחירים</option><option value="priceHigh">מחיר: גבוה לנמוך</option><option value="priceLow">מחיר: נמוך לגבוה</option><option value="gainers">העולים</option><option value="losers">היורדים</option></select>
+   <button class="clear-filters" id="clearFilters">נקה סינון</button>
  </div>`;
 }
 function filterWatches(){
- let arr=[...watches];
- if(marketState.q){const q=marketState.q.toLowerCase();arr=arr.filter(w=>[w.brand,w.collection,w.model,w.ref].join(' ').toLowerCase().includes(q));}
- if(marketState.brand!=='All')arr=arr.filter(w=>w.brand===marketState.brand);
- if(marketState.status!=='All')arr=arr.filter(w=>w.status===marketState.status);
+ let arr=filterBase();
  const sorts={popular:(a,b)=>b.vol-a.vol,priceHigh:(a,b)=>b.market-a.market,priceLow:(a,b)=>a.market-b.market,gainers:(a,b)=>b.change-a.change,losers:(a,b)=>a.change-b.change};
  return arr.sort(sorts[marketState.sort]||sorts.popular);
 }
@@ -182,10 +208,17 @@ function marketPage(){
 }
 function bindMarket(){
  bindCommon();
+ const bind=(id,key,reset=[])=>{const el=document.getElementById(id);if(!el)return;el.onchange=e=>{marketState[key]=e.target.value;reset.forEach(k=>marketState[k]='All');refreshMarketOnly();};};
  const search=document.getElementById('marketSearch'); if(search)search.oninput=e=>{marketState.q=e.target.value;refreshMarketOnly();};
- const brand=document.getElementById('brandFilter');if(brand)brand.onchange=e=>{marketState.brand=e.target.value;refreshMarketOnly();};
- const status=document.getElementById('statusFilter');if(status)status.onchange=e=>{marketState.status=e.target.value;refreshMarketOnly();};
+ bind('brandFilter','brand',['collection','model']);
+ bind('collectionFilter','collection',['model']);
+ bind('modelFilter','model');
+ bind('yearFilter','year');
+ bind('statusFilter','status');
+ bind('materialFilter','material');
+ bind('sizeFilter','size');
  const sort=document.getElementById('sortFilter');if(sort){sort.value=marketState.sort;sort.onchange=e=>{marketState.sort=e.target.value;refreshMarketOnly();};}
+ const clear=document.getElementById('clearFilters');if(clear)clear.onclick=()=>{marketState={q:'',brand:'All',collection:'All',model:'All',year:'All',status:'All',material:'All',size:'All',sort:'popular'};refreshMarketOnly();};
 }
 function refreshMarketOnly(){ const sec=document.querySelector('#market'); if(!sec)return; sec.outerHTML=marketBlock(); bindMarket(); }
 
@@ -201,7 +234,7 @@ function discontinuedStrip(){
  const data=watches.filter(w=>w.status==='Discontinued').slice(0,4);
  return `<section class="section-v2"><div class="shell"><div class="section-head"><div><div class="micro-label">DISCONTINUED</div><h2>דגמים שהשוק ממשיך לתמחר</h2><p>ייצור נגמר. השוק לא.</p></div><a class="text-link" href="#/discontinued">כל הדגמים ←</a></div><div class="cards-4">${data.map(w=>`<article class="watch-card" data-watch="${w.ref}"><div class="card-status">DISCONTINUED</div><div class="card-art"><span>${w.brand}</span><b>${w.ref}</b></div><h3>${w.collection}</h3><p>${w.model}</p><div class="card-bottom"><b>${fmt(w.market)}</b><span class="${w.change>=0?'positive':'negative'}">${w.change>=0?'+':''}${w.change}%</span></div></article>`).join('')}</div></div></section>`;
 }
-function discontinuedPage(){marketState.status='Discontinued';marketState.q='';marketState.brand='All';app.innerHTML=`<section class="page-hero"><div class="shell"><div class="micro-label">DISCONTINUED INDEX</div><h1>הפסיקו לייצר. לא הפסיקו להיסחר.</h1><p>מעקב אחרי References שיצאו מייצור ועדיין פעילים בשוק המשני.</p></div></section>${marketBlock({title:'Discontinued Market',subtitle:'מחירי שוק לדגמים שהופסקו'})}`;bindMarket();}
+function discontinuedPage(){marketState={q:'',brand:'All',collection:'All',model:'All',year:'All',status:'Discontinued',material:'All',size:'All',sort:'popular'};app.innerHTML=`<section class="page-hero"><div class="shell"><div class="micro-label">DISCONTINUED INDEX</div><h1>הפסיקו לייצר. לא הפסיקו להיסחר.</h1><p>מעקב אחרי References שיצאו מייצור ועדיין פעילים בשוק המשני.</p></div></section>${marketBlock({title:'Discontinued Market',subtitle:'מחירי שוק לדגמים שהופסקו'})}`;bindMarket();}
 
 function howItWorks(){
  return `<section class="section-v2 method-section"><div class="shell method-grid"><div><div class="micro-label">WATCHVALUE METHOD</div><h2>מחיר אחד.<br>מאחורי הקלעים — הרבה דאטה.</h2><p>המטרה של WatchValue היא לא להעתיק מחיר מאתר אחד, אלא לנקות, להשוות ולשקלל מספר מקורות כדי לקבל טווח שוק שימושי.</p></div><div class="method-steps"><div><span>01</span><b>איסוף</b><p>Listings, תוצאות מכירה, Retail ומידע Reference.</p></div><div><span>02</span><b>ניקוי</b><p>כפילויות, חריגות, מצב, שנתון ו־Full Set.</p></div><div><span>03</span><b>תמחור</b><p>Global Market מול התאמת שוק ישראל.</p></div><div><span>04</span><b>ביטחון</b><p>Sample size, freshness ו־confidence score.</p></div></div></div></section>`;
@@ -247,7 +280,7 @@ function notFound(){app.innerHTML='<section class="page-hero"><div class="shell"
 function bindCommon(){
  document.querySelectorAll('[data-watch]').forEach(el=>el.onclick=e=>{if(e.target.closest('[data-save]'))return;location.hash='#/watch/'+encodeURIComponent(el.dataset.watch);});
  document.querySelectorAll('[data-save]').forEach(el=>el.onclick=e=>{e.stopPropagation();saveToggle(el.dataset.save);});
- document.querySelectorAll('[data-brand]').forEach(el=>el.onclick=()=>{marketState.brand=el.dataset.brand;marketState.status='All';marketState.q='';location.hash='#/market';});
+ document.querySelectorAll('[data-brand]').forEach(el=>el.onclick=()=>{marketState={q:'',brand:el.dataset.brand,collection:'All',model:'All',year:'All',status:'All',material:'All',size:'All',sort:'popular'};location.hash='#/market';});
  document.querySelectorAll('[data-pricing]').forEach(el=>el.onclick=openPricing);
  updateNav();
 }
