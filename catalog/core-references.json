@@ -8,7 +8,13 @@
     "production_start": 2018,
     "case_size_mm": 40,
     "material": "Oystersteel",
-    "dial": "Black"
+    "dial": "Black",
+    "official_model_name": "GMT-Master II",
+    "nickname": "Pepsi",
+    "generation": "1267xx",
+    "bracelet": "Jubilee / Oyster",
+    "bezel": "Blue / Red Cerachrom",
+    "variant_key": "126710BLRO"
   },
   {
     "brand": "Rolex",
@@ -19,7 +25,13 @@
     "production_start": 2019,
     "case_size_mm": 40,
     "material": "Oystersteel",
-    "dial": "Black"
+    "dial": "Black",
+    "official_model_name": "GMT-Master II",
+    "nickname": "Batman / Batgirl",
+    "generation": "1267xx",
+    "bracelet": "Oyster / Jubilee",
+    "bezel": "Blue / Black Cerachrom",
+    "variant_key": "126710BLNR"
   },
   {
     "brand": "Rolex",
@@ -30,7 +42,13 @@
     "production_start": 2022,
     "case_size_mm": 40,
     "material": "Oystersteel",
-    "dial": "Black"
+    "dial": "Black",
+    "official_model_name": "GMT-Master II",
+    "nickname": "Sprite",
+    "generation": "1267xx Left-Hand",
+    "bracelet": "Oyster / Jubilee",
+    "bezel": "Green / Black Cerachrom",
+    "variant_key": "126720VTNR"
   },
   {
     "brand": "Rolex",
@@ -41,7 +59,13 @@
     "production_start": 2020,
     "case_size_mm": 41,
     "material": "Oystersteel",
-    "dial": "Black"
+    "dial": "Black",
+    "official_model_name": "Submariner Date",
+    "nickname": "Black Sub",
+    "generation": "1266xx",
+    "bracelet": "Oyster",
+    "bezel": "Black Cerachrom",
+    "variant_key": "126610LN"
   },
   {
     "brand": "Rolex",
@@ -52,7 +76,13 @@
     "production_start": 2020,
     "case_size_mm": 41,
     "material": "Oystersteel",
-    "dial": "Black"
+    "dial": "Black",
+    "official_model_name": "Submariner Date",
+    "nickname": "Starbucks / Cermit",
+    "generation": "1266xx",
+    "bracelet": "Oyster",
+    "bezel": "Green Cerachrom",
+    "variant_key": "126610LV"
   },
   {
     "brand": "Rolex",
@@ -64,7 +94,13 @@
     "production_end": 2020,
     "case_size_mm": 40,
     "material": "Oystersteel",
-    "dial": "Green"
+    "dial": "Green",
+    "official_model_name": "Submariner Date",
+    "nickname": "Hulk",
+    "generation": "1166xx",
+    "bracelet": "Oyster",
+    "bezel": "Green Cerachrom",
+    "variant_key": "116610LV"
   },
   {
     "brand": "Rolex",
@@ -75,7 +111,13 @@
     "production_start": 2023,
     "case_size_mm": 40,
     "material": "Oystersteel",
-    "dial": "White"
+    "dial": "White",
+    "official_model_name": "Cosmograph Daytona",
+    "nickname": "Panda",
+    "generation": "1265xx",
+    "bracelet": "Oyster",
+    "bezel": "Black Cerachrom",
+    "variant_key": "126500LN-WHITE"
   },
   {
     "brand": "Rolex",
@@ -86,7 +128,13 @@
     "production_start": 2023,
     "case_size_mm": 40,
     "material": "Oystersteel",
-    "dial": "Black"
+    "dial": "Black",
+    "official_model_name": "Cosmograph Daytona",
+    "nickname": "Black Dial",
+    "generation": "1265xx",
+    "bracelet": "Oyster",
+    "bezel": "Black Cerachrom",
+    "variant_key": "126500LN-BLACK"
   },
   {
     "brand": "Rolex",
@@ -97,7 +145,13 @@
     "production_start": 2015,
     "case_size_mm": 40,
     "material": "18K Yellow Gold",
-    "dial": "Various"
+    "dial": "Various",
+    "official_model_name": "Day-Date 40",
+    "nickname": null,
+    "generation": "228xxx",
+    "bracelet": "President",
+    "bezel": "Fluted",
+    "variant_key": "228238"
   },
   {
     "brand": "Rolex",
@@ -108,7 +162,13 @@
     "production_start": 2023,
     "case_size_mm": 42,
     "material": "Oystersteel / White Gold",
-    "dial": "Blue"
+    "dial": "Blue",
+    "official_model_name": "Sky-Dweller",
+    "nickname": null,
+    "generation": "336xxx",
+    "bracelet": "Oyster / Jubilee",
+    "bezel": "Fluted White Gold",
+    "variant_key": "336934"
   },
   {
     "brand": "Rolex",
@@ -119,7 +179,13 @@
     "production_start": 2019,
     "case_size_mm": 40,
     "material": "Oystersteel / Platinum",
-    "dial": "Rhodium"
+    "dial": "Rhodium",
+    "official_model_name": "Yacht-Master 40",
+    "nickname": "Rhodium",
+    "generation": "1266xx",
+    "bracelet": "Oyster",
+    "bezel": "Platinum",
+    "variant_key": "126622-RHODIUM"
   },
   {
     "brand": "Rolex",
@@ -130,7 +196,13 @@
     "production_start": 2021,
     "case_size_mm": 42,
     "material": "Oystersteel",
-    "dial": "White"
+    "dial": "White",
+    "official_model_name": "Explorer II",
+    "nickname": "Polar",
+    "generation": "226xxx",
+    "bracelet": "Oyster",
+    "bezel": "Fixed Steel 24h",
+    "variant_key": "226570-WHITE"
   },
   {
     "brand": "Patek Philippe",
@@ -142,7 +214,13 @@
     "production_end": 2021,
     "case_size_mm": 40,
     "material": "Steel",
-    "dial": "Blue"
+    "dial": "Blue",
+    "official_model_name": "Nautilus",
+    "nickname": null,
+    "generation": null,
+    "bracelet": null,
+    "bezel": null,
+    "variant_key": "5711/1A-010"
   },
   {
     "brand": "Patek Philippe",
@@ -153,7 +231,13 @@
     "production_start": 2006,
     "case_size_mm": 40,
     "material": "Steel",
-    "dial": "Blue"
+    "dial": "Blue",
+    "official_model_name": "Nautilus",
+    "nickname": null,
+    "generation": null,
+    "bracelet": null,
+    "bezel": null,
+    "variant_key": "5712/1A-001"
   },
   {
     "brand": "Patek Philippe",
@@ -163,7 +247,13 @@
     "status": "current",
     "case_size_mm": 40.5,
     "material": "Steel",
-    "dial": "Blue"
+    "dial": "Blue",
+    "official_model_name": "Nautilus",
+    "nickname": null,
+    "generation": null,
+    "bracelet": null,
+    "bezel": null,
+    "variant_key": "5990/1A-011"
   },
   {
     "brand": "Patek Philippe",
@@ -173,7 +263,13 @@
     "status": "current",
     "case_size_mm": 40.8,
     "material": "Steel",
-    "dial": "Black"
+    "dial": "Black",
+    "official_model_name": "Aquanaut",
+    "nickname": null,
+    "generation": null,
+    "bracelet": null,
+    "bezel": null,
+    "variant_key": "5167A-001"
   },
   {
     "brand": "Patek Philippe",
@@ -183,7 +279,13 @@
     "status": "discontinued",
     "case_size_mm": 40.8,
     "material": "Steel",
-    "dial": "Black"
+    "dial": "Black",
+    "official_model_name": "Aquanaut",
+    "nickname": null,
+    "generation": null,
+    "bracelet": null,
+    "bezel": null,
+    "variant_key": "5164A-001"
   },
   {
     "brand": "Audemars Piguet",
@@ -194,7 +296,13 @@
     "production_start": 2022,
     "case_size_mm": 41,
     "material": "Steel",
-    "dial": "Blue"
+    "dial": "Blue",
+    "official_model_name": "Royal Oak",
+    "nickname": null,
+    "generation": null,
+    "bracelet": null,
+    "bezel": null,
+    "variant_key": "15510ST.OO.1320ST.06"
   },
   {
     "brand": "Audemars Piguet",
@@ -205,7 +313,13 @@
     "production_start": 2022,
     "case_size_mm": 39,
     "material": "Steel",
-    "dial": "Blue"
+    "dial": "Blue",
+    "official_model_name": "Royal Oak",
+    "nickname": null,
+    "generation": null,
+    "bracelet": null,
+    "bezel": null,
+    "variant_key": "16202ST.OO.1240ST.02"
   },
   {
     "brand": "Audemars Piguet",
@@ -215,7 +329,13 @@
     "status": "current",
     "case_size_mm": 42,
     "material": "Steel",
-    "dial": "Blue"
+    "dial": "Blue",
+    "official_model_name": "Royal Oak Offshore",
+    "nickname": null,
+    "generation": null,
+    "bracelet": null,
+    "bezel": null,
+    "variant_key": "26238ST.OO.2000ST.01"
   },
   {
     "brand": "Cartier",
@@ -226,7 +346,13 @@
     "production_start": 2018,
     "case_size_mm": 39.8,
     "material": "Steel",
-    "dial": "White"
+    "dial": "White",
+    "official_model_name": "Santos de Cartier",
+    "nickname": null,
+    "generation": null,
+    "bracelet": null,
+    "bezel": null,
+    "variant_key": "WSSA0018"
   },
   {
     "brand": "Cartier",
@@ -236,7 +362,13 @@
     "status": "current",
     "case_size_mm": 35.1,
     "material": "Steel",
-    "dial": "White"
+    "dial": "White",
+    "official_model_name": "Santos de Cartier",
+    "nickname": null,
+    "generation": null,
+    "bracelet": null,
+    "bezel": null,
+    "variant_key": "WSSA0029"
   },
   {
     "brand": "Cartier",
@@ -247,7 +379,13 @@
     "production_start": 2021,
     "case_size_mm": 33.7,
     "material": "Steel",
-    "dial": "White"
+    "dial": "White",
+    "official_model_name": "Tank Must",
+    "nickname": null,
+    "generation": null,
+    "bracelet": null,
+    "bezel": null,
+    "variant_key": "WSTA0041"
   },
   {
     "brand": "Cartier",
@@ -257,7 +395,13 @@
     "status": "current",
     "case_size_mm": 42,
     "material": "Steel",
-    "dial": "Silver"
+    "dial": "Silver",
+    "official_model_name": "Ballon Bleu",
+    "nickname": null,
+    "generation": null,
+    "bracelet": null,
+    "bezel": null,
+    "variant_key": "WSBB0049"
   },
   {
     "brand": "Omega",
@@ -268,7 +412,13 @@
     "production_start": 2021,
     "case_size_mm": 42,
     "material": "Steel",
-    "dial": "Black"
+    "dial": "Black",
+    "official_model_name": "Speedmaster",
+    "nickname": null,
+    "generation": null,
+    "bracelet": null,
+    "bezel": null,
+    "variant_key": "310.30.42.50.01.002"
   },
   {
     "brand": "Omega",
@@ -279,7 +429,13 @@
     "production_start": 2021,
     "case_size_mm": 42,
     "material": "Steel",
-    "dial": "Black"
+    "dial": "Black",
+    "official_model_name": "Speedmaster",
+    "nickname": null,
+    "generation": null,
+    "bracelet": null,
+    "bezel": null,
+    "variant_key": "310.30.42.50.01.001"
   },
   {
     "brand": "Omega",
@@ -290,7 +446,13 @@
     "production_start": 2018,
     "case_size_mm": 42,
     "material": "Steel",
-    "dial": "Black"
+    "dial": "Black",
+    "official_model_name": "Seamaster Diver 300M",
+    "nickname": null,
+    "generation": null,
+    "bracelet": null,
+    "bezel": null,
+    "variant_key": "210.30.42.20.01.001"
   },
   {
     "brand": "Omega",
@@ -301,7 +463,13 @@
     "production_start": 2018,
     "case_size_mm": 42,
     "material": "Steel",
-    "dial": "Blue"
+    "dial": "Blue",
+    "official_model_name": "Seamaster Diver 300M",
+    "nickname": null,
+    "generation": null,
+    "bracelet": null,
+    "bezel": null,
+    "variant_key": "210.30.42.20.03.001"
   },
   {
     "brand": "Vacheron Constantin",
@@ -313,7 +481,13 @@
     "production_end": 2024,
     "case_size_mm": 41,
     "material": "Steel",
-    "dial": "Blue"
+    "dial": "Blue",
+    "official_model_name": "Overseas",
+    "nickname": null,
+    "generation": null,
+    "bracelet": null,
+    "bezel": null,
+    "variant_key": "4500V/110A-B128"
   },
   {
     "brand": "Vacheron Constantin",
@@ -324,7 +498,13 @@
     "production_start": 2024,
     "case_size_mm": 41,
     "material": "Steel",
-    "dial": "Blue"
+    "dial": "Blue",
+    "official_model_name": "Overseas",
+    "nickname": null,
+    "generation": null,
+    "bracelet": null,
+    "bezel": null,
+    "variant_key": "4520V/210A-B128"
   },
   {
     "brand": "Richard Mille",
@@ -336,7 +516,13 @@
     "production_end": 2022,
     "case_size_mm": 44.5,
     "material": "Titanium",
-    "dial": "Skeleton"
+    "dial": "Skeleton",
+    "official_model_name": "RM 11",
+    "nickname": null,
+    "generation": null,
+    "bracelet": null,
+    "bezel": null,
+    "variant_key": "RM11-03"
   },
   {
     "brand": "Richard Mille",
@@ -346,7 +532,13 @@
     "status": "current",
     "case_size_mm": 38.7,
     "material": "Titanium",
-    "dial": "Skeleton"
+    "dial": "Skeleton",
+    "official_model_name": "RM 67",
+    "nickname": null,
+    "generation": null,
+    "bracelet": null,
+    "bezel": null,
+    "variant_key": "RM67-01"
   },
   {
     "brand": "Tudor",
@@ -357,7 +549,13 @@
     "production_start": 2018,
     "case_size_mm": 39,
     "material": "Steel",
-    "dial": "Black"
+    "dial": "Black",
+    "official_model_name": "Black Bay Fifty-Eight",
+    "nickname": null,
+    "generation": null,
+    "bracelet": null,
+    "bezel": null,
+    "variant_key": "79030N"
   },
   {
     "brand": "Tudor",
@@ -368,7 +566,13 @@
     "production_start": 2023,
     "case_size_mm": 37,
     "material": "Steel",
-    "dial": "Black"
+    "dial": "Black",
+    "official_model_name": "Black Bay 54",
+    "nickname": null,
+    "generation": null,
+    "bracelet": null,
+    "bezel": null,
+    "variant_key": "79000N"
   },
   {
     "brand": "IWC",
@@ -379,7 +583,13 @@
     "production_start": 2022,
     "case_size_mm": 40,
     "material": "Steel",
-    "dial": "Black"
+    "dial": "Black",
+    "official_model_name": "Pilot’s Watch",
+    "nickname": null,
+    "generation": null,
+    "bracelet": null,
+    "bezel": null,
+    "variant_key": "IW328201"
   },
   {
     "brand": "Breitling",
@@ -390,7 +600,13 @@
     "production_start": 2022,
     "case_size_mm": 43,
     "material": "Steel",
-    "dial": "Black"
+    "dial": "Black",
+    "official_model_name": "Navitimer B01",
+    "nickname": null,
+    "generation": null,
+    "bracelet": null,
+    "bezel": null,
+    "variant_key": "AB0138211B1P1"
   },
   {
     "brand": "Panerai",
@@ -400,7 +616,13 @@
     "status": "current",
     "case_size_mm": 44,
     "material": "Steel",
-    "dial": "Black"
+    "dial": "Black",
+    "official_model_name": "Luminor Marina",
+    "nickname": null,
+    "generation": null,
+    "bracelet": null,
+    "bezel": null,
+    "variant_key": "PAM01312"
   },
   {
     "brand": "Jaeger-LeCoultre",
@@ -409,7 +631,13 @@
     "reference": "Q3978480",
     "status": "current",
     "material": "Steel",
-    "dial": "Blue"
+    "dial": "Blue",
+    "official_model_name": "Reverso Tribute",
+    "nickname": null,
+    "generation": null,
+    "bracelet": null,
+    "bezel": null,
+    "variant_key": "Q3978480"
   },
   {
     "brand": "Grand Seiko",
@@ -419,7 +647,13 @@
     "status": "current",
     "case_size_mm": 41,
     "material": "Titanium",
-    "dial": "White"
+    "dial": "White",
+    "official_model_name": "Heritage",
+    "nickname": null,
+    "generation": null,
+    "bracelet": null,
+    "bezel": null,
+    "variant_key": "SBGA211"
   },
   {
     "brand": "Hublot",
@@ -429,7 +663,13 @@
     "status": "current",
     "case_size_mm": 42,
     "material": "Ceramic",
-    "dial": "Skeleton"
+    "dial": "Skeleton",
+    "official_model_name": "Big Bang Unico",
+    "nickname": null,
+    "generation": null,
+    "bracelet": null,
+    "bezel": null,
+    "variant_key": "441.CI.1171.RX"
   },
   {
     "brand": "A. Lange & Söhne",
@@ -439,7 +679,13 @@
     "status": "current",
     "case_size_mm": 40.5,
     "material": "Steel",
-    "dial": "Blue"
+    "dial": "Blue",
+    "official_model_name": "Odysseus",
+    "nickname": null,
+    "generation": null,
+    "bracelet": null,
+    "bezel": null,
+    "variant_key": "363.179"
   },
   {
     "brand": "F.P. Journe",
@@ -450,6 +696,12 @@
     "production_start": 2009,
     "case_size_mm": 39,
     "material": "Tantalum",
-    "dial": "Blue"
+    "dial": "Blue",
+    "official_model_name": "Chronomètre Bleu",
+    "nickname": null,
+    "generation": null,
+    "bracelet": null,
+    "bezel": null,
+    "variant_key": "CB"
   }
 ]
