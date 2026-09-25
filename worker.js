@@ -68,14 +68,20 @@ async function syncCoreCatalog(){
         );
         const exists=await client.query('select id from watches where lower(reference)=lower($1)',[row.reference]);
         await client.query(`
-          insert into watches(brand_id,collection,model,reference,status,production_start,production_end,case_size_mm,material,dial,updated_at)
-          values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,now())
+          insert into watches(
+            brand_id,collection,model,official_model_name,nickname,generation,bracelet,bezel,variant_key,
+            reference,status,production_start,production_end,case_size_mm,material,dial,updated_at
+          )
+          values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,now())
           on conflict(reference) do update set
-            brand_id=excluded.brand_id,collection=excluded.collection,model=excluded.model,status=excluded.status,
+            brand_id=excluded.brand_id,collection=excluded.collection,model=excluded.model,
+            official_model_name=excluded.official_model_name,nickname=excluded.nickname,generation=excluded.generation,
+            bracelet=excluded.bracelet,bezel=excluded.bezel,variant_key=excluded.variant_key,status=excluded.status,
             production_start=excluded.production_start,production_end=excluded.production_end,case_size_mm=excluded.case_size_mm,
             material=excluded.material,dial=excluded.dial,updated_at=now()
         `,[
-          brand.id,row.collection||null,row.model,row.reference,
+          brand.id,row.collection||null,row.model,row.official_model_name||row.collection||row.model,row.nickname||null,
+          row.generation||null,row.bracelet||null,row.bezel||null,row.variant_key||row.reference,row.reference,
           String(row.status||'current').toLowerCase().includes('dis')?'discontinued':
           String(row.status||'current').toLowerCase().includes('limit')?'limited':'current',
           row.production_start||null,row.production_end||null,row.case_size_mm||null,row.material||null,row.dial||null
