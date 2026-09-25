@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700&family=DM+Sans:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=10">
+  <link rel="stylesheet" href="/styles.css?v=11">
 </head>
 <body>
   <div class="announcement">WATCHVALUE BETA <span>·</span> המחירים כרגע להדגמת המוצר בלבד</div>
@@ -74,12 +74,15 @@
       <button class="close-button" data-close-search>×</button>
       <div class="search-title">חיפוש מהיר</div>
       <input id="globalSearchInput" autocomplete="off" placeholder="Rolex, Daytona, 126610LN...">
+      <button class="image-search-button" id="imageSearchButton"><span>▣</span><b>חיפוש לפי תמונה</b><small>צלם או העלה תמונה של השעון</small></button>
+      <input id="imageSearchInput" type="file" accept="image/*" capture="environment" hidden>
+      <div id="imageSearchPreview" class="image-search-preview" hidden></div>
       <div id="globalSearchResults" class="search-results"></div>
     </section>
   </div>
 
   <div id="toast" class="toast"></div>
 
-  <script src="/app.js?v=10"></script>
+  <script src="/app.js?v=11"></script>
 </body>
 </html>
