@@ -32,6 +32,12 @@ async function loadDatabaseCatalog(){
       brand:r.brand,
       collection:r.collection||'',
       model:r.model||'',
+      officialModel:r.official_model_name||r.collection||r.model||'',
+      nickname:r.nickname||'',
+      generation:r.generation||'',
+      bracelet:r.bracelet||'',
+      bezel:r.bezel||'',
+      variantKey:r.variant_key||r.reference,
       ref:r.reference,
       market:Number(r.market_value_ils)||0,
       retail:r.retail_price_ils==null?null:Number(r.retail_price_ils),
@@ -71,7 +77,7 @@ const app = document.getElementById('app');
 const fmt = n => n ? new Intl.NumberFormat('he-IL',{style:'currency',currency:'ILS',maximumFractionDigits:0}).format(n) : '—';
 const fmtPlain = n => new Intl.NumberFormat('he-IL',{maximumFractionDigits:0}).format(n);
 const watchKey = w => w.ref;
-let marketState={q:'',brand:'All',collection:'All',model:'All',year:'All',status:'All',material:'All',size:'All',sort:'popular'};
+let marketState={q:'',brand:'All',collection:'All',model:'All',generation:'All',year:'All',reference:'All',bracelet:'All',status:'All',material:'All',size:'All',sort:'popular'};
 
 function miniChart(change=1, id='g'){
  const up=change>=0;
@@ -151,7 +157,7 @@ function marketBlock({limit=null,title='מחירון השוק',subtitle='חפש 
 
 function marketRow(w){
  return `<article class="market-row" data-watch="${w.ref}">
-   <div class="watch-ident"><button class="heart ${isSaved(w.ref)?'saved':''}" data-save="${w.ref}" aria-label="Watchlist">♡</button><div class="thumb">${w.brand.slice(0,2).toUpperCase()}</div><div><b>${w.brand}</b><strong>${w.collection} ${w.model}</strong><small>Ref. ${w.ref} · ${statusLabel(w.status)}</small></div></div>
+   <div class="watch-ident"><button class="heart ${isSaved(w.ref)?'saved':''}" data-save="${w.ref}" aria-label="Watchlist">♡</button><div class="thumb">${w.brand.slice(0,2).toUpperCase()}</div><div><b>${w.brand}</b><strong>${w.officialModel||w.collection} ${w.nickname?'· '+w.nickname:''}</strong><small>Ref. ${w.ref}${w.generation?' · '+w.generation:''} · ${statusLabel(w.status)}</small></div></div>
    <div class="market-cell"><small>Market</small><b>${fmt(w.market)}</b></div>
    <div class="market-cell"><small>Retail</small><b>${fmt(w.retail)}</b></div>
    <div class="market-cell"><small>12M</small><b class="${w.change>=0?'positive':'negative'}">${w.change>=0?'+':''}${w.change}%</b></div>
@@ -165,10 +171,13 @@ function optionList(values,current,label='הכל'){return '<option value="All">'
 function filterBase(exclude=''){
  let arr=[...watches];
  const s=marketState;
- if(exclude!=='q'&&s.q){const q=s.q.toLowerCase();arr=arr.filter(w=>[w.brand,w.collection,w.model,w.ref,w.years,w.material,w.size,w.dial].join(' ').toLowerCase().includes(q));}
+ if(exclude!=='q'&&s.q){const q=s.q.toLowerCase();arr=arr.filter(w=>[w.brand,w.collection,w.officialModel,w.model,w.nickname,w.generation,w.ref,w.years,w.material,w.size,w.dial,w.bracelet,w.bezel].join(' ').toLowerCase().includes(q));}
  if(exclude!=='brand'&&s.brand!=='All')arr=arr.filter(w=>w.brand===s.brand);
  if(exclude!=='collection'&&s.collection!=='All')arr=arr.filter(w=>w.collection===s.collection);
  if(exclude!=='model'&&s.model!=='All')arr=arr.filter(w=>w.model===s.model);
+ if(exclude!=='generation'&&s.generation!=='All')arr=arr.filter(w=>w.generation===s.generation);
+ if(exclude!=='reference'&&s.reference!=='All')arr=arr.filter(w=>w.ref===s.reference);
+ if(exclude!=='bracelet'&&s.bracelet!=='All')arr=arr.filter(w=>w.bracelet===s.bracelet);
  if(exclude!=='year'&&s.year!=='All'){const y=Number(s.year);arr=arr.filter(w=>(w.productionStart||0)<=y&&(!w.productionEnd||w.productionEnd>=y));}
  if(exclude!=='status'&&s.status!=='All')arr=arr.filter(w=>w.status===s.status);
  if(exclude!=='material'&&s.material!=='All')arr=arr.filter(w=>w.material===s.material);
@@ -178,6 +187,9 @@ function filterBase(exclude=''){
 function filtersHtml(){
  const collections=uniqSorted(filterBase('collection').map(w=>w.collection));
  const models=uniqSorted(filterBase('model').map(w=>w.model));
+ const generations=uniqSorted(filterBase('generation').map(w=>w.generation));
+ const references=uniqSorted(filterBase('reference').map(w=>w.ref));
+ const bracelets=uniqSorted(filterBase('bracelet').map(w=>w.bracelet));
  const materials=uniqSorted(filterBase('material').map(w=>w.material));
  const sizes=uniqSorted(filterBase('size').map(w=>w.size));
  const yearRows=filterBase('year').flatMap(w=>{if(!w.productionStart)return[];const end=w.productionEnd||new Date().getFullYear();const a=[];for(let y=w.productionStart;y<=end;y++)a.push(y);return a;});
@@ -187,7 +199,10 @@ function filtersHtml(){
    <select id="brandFilter">${optionList(uniqSorted(watches.map(w=>w.brand)),marketState.brand,'כל המותגים')}</select>
    <select id="collectionFilter">${optionList(collections,marketState.collection,'כל הקולקציות')}</select>
    <select id="modelFilter">${optionList(models,marketState.model,'כל המודלים')}</select>
+   <select id="generationFilter">${optionList(generations,marketState.generation,'כל הדורות')}</select>
    <select id="yearFilter">${optionList(years,marketState.year,'כל השנתונים')}</select>
+   <select id="referenceFilter">${optionList(references,marketState.reference,'כל ה-References')}</select>
+   <select id="braceletFilter">${optionList(bracelets,marketState.bracelet,'כל הצמידים')}</select>
    <select id="statusFilter"><option value="All">כל הסטטוסים</option><option value="Current" ${marketState.status==='Current'?'selected':''}>בייצור</option><option value="Discontinued" ${marketState.status==='Discontinued'?'selected':''}>הופסק ייצור</option><option value="Limited" ${marketState.status==='Limited'?'selected':''}>מהדורה מוגבלת</option></select>
    <select id="materialFilter">${optionList(materials,marketState.material,'כל החומרים')}</select>
    <select id="sizeFilter">${optionList(sizes,marketState.size,'כל הקטרים')}</select>
@@ -210,15 +225,18 @@ function bindMarket(){
  bindCommon();
  const bind=(id,key,reset=[])=>{const el=document.getElementById(id);if(!el)return;el.onchange=e=>{marketState[key]=e.target.value;reset.forEach(k=>marketState[k]='All');refreshMarketOnly();};};
  const search=document.getElementById('marketSearch'); if(search)search.oninput=e=>{marketState.q=e.target.value;refreshMarketOnly();};
- bind('brandFilter','brand',['collection','model']);
- bind('collectionFilter','collection',['model']);
- bind('modelFilter','model');
- bind('yearFilter','year');
+ bind('brandFilter','brand',['collection','model','generation','reference','bracelet']);
+ bind('collectionFilter','collection',['model','generation','reference','bracelet']);
+ bind('modelFilter','model',['generation','reference']);
+ bind('generationFilter','generation',['reference']);
+ bind('yearFilter','year',['reference']);
+ bind('referenceFilter','reference');
+ bind('braceletFilter','bracelet');
  bind('statusFilter','status');
  bind('materialFilter','material');
  bind('sizeFilter','size');
  const sort=document.getElementById('sortFilter');if(sort){sort.value=marketState.sort;sort.onchange=e=>{marketState.sort=e.target.value;refreshMarketOnly();};}
- const clear=document.getElementById('clearFilters');if(clear)clear.onclick=()=>{marketState={q:'',brand:'All',collection:'All',model:'All',year:'All',status:'All',material:'All',size:'All',sort:'popular'};refreshMarketOnly();};
+ const clear=document.getElementById('clearFilters');if(clear)clear.onclick=()=>{marketState={q:'',brand:'All',collection:'All',model:'All',generation:'All',year:'All',reference:'All',bracelet:'All',status:'All',material:'All',size:'All',sort:'popular'};refreshMarketOnly();};
 }
 function refreshMarketOnly(){ const sec=document.querySelector('#market'); if(!sec)return; sec.outerHTML=marketBlock(); bindMarket(); }
 
@@ -254,14 +272,14 @@ function watchPage(ref){
       <div class="art-caption">Illustrative product view · Image integration next</div>
     </div>
     <div class="watch-info">
-      <div class="watch-title-row"><div><div class="micro-label">${w.brand.toUpperCase()} · ${statusLabel(w.status).toUpperCase()}</div><h1>${w.collection}</h1><h3>${w.model}</h3><p>Reference <b>${w.ref}</b> · ${w.years}</p></div><span class="status-chip ${w.status==='Discontinued'?'disc':''}">${statusLabel(w.status)}</span></div>
+      <div class="watch-title-row"><div><div class="micro-label">${w.brand.toUpperCase()} · ${statusLabel(w.status).toUpperCase()}</div><h1>${w.officialModel||w.collection}</h1><h3>${w.nickname||w.model}</h3><p>Reference <b>${w.ref}</b> · ${w.years}${w.generation?' · דור '+w.generation:''}</p></div><span class="status-chip ${w.status==='Discontinued'?'disc':''}">${statusLabel(w.status)}</span></div>
       <div class="valuation-card">
         <div class="valuation-main"><span>WatchValue Market Estimate</span><strong>${fmt(w.market)}</strong><small>Demo estimate · data engine in development</small></div>
         <div class="valuation-change ${w.change>=0?'positive':'negative'}"><span>12M</span><b>${w.change>=0?'+':''}${w.change}%</b></div>
       </div>
       <div class="price-trio"><div><span>Retail / MSRP</span><b>${fmt(w.retail)}</b></div><div><span>Private sale</span><b>${fmt(Math.round(w.market*.96))}</b></div><div><span>Dealer ask</span><b>${fmt(Math.round(w.market*1.055))}</b></div></div>
       <div class="chart-panel"><div class="chart-head"><div><b>Price history</b><small>12 חודשים</small></div><div class="chart-tabs"><button>1M</button><button>6M</button><button class="active">1Y</button><button>5Y</button></div></div><div class="main-chart">${miniChart(w.change,'watchChart')}</div><div class="chart-axis"><span>${fmt(Math.round(w.market*.85))}</span><span>${fmt(w.market)}</span></div></div>
-      <div class="spec-grid"><div><span>קוטר</span><b>${w.size}</b></div><div><span>חומר</span><b>${w.material}</b></div><div><span>לוח</span><b>${w.dial}</b></div><div><span>סחירות</span><b>${w.liquidity}</b></div></div>
+      <div class="spec-grid"><div><span>קוטר</span><b>${w.size}</b></div><div><span>חומר</span><b>${w.material}</b></div><div><span>לוח</span><b>${w.dial}</b></div><div><span>צמיד</span><b>${w.bracelet||'—'}</b></div><div><span>בזל</span><b>${w.bezel||'—'}</b></div><div><span>דור</span><b>${w.generation||'—'}</b></div><div><span>סחירות</span><b>${w.liquidity}</b></div></div>
       <div class="insight-card"><div><div class="micro-label">MARKET INSIGHT</div><h3>${premium!==null?`נסחר ${premium>=0?'מעל':'מתחת'} ל־Retail בכ־${Math.abs(premium)}%`:'Reference ללא Retail פעיל'}</h3><p>ב־Premium נציג כאן פער ישראל/עולם, מספר תצפיות, confidence score וזמן מכירה משוער.</p></div><button class="soft-button" data-pricing>פתח Premium</button></div>
     </div>
   </div>
@@ -299,7 +317,7 @@ function openSearch(){const m=document.getElementById('globalSearch');m.style.di
 function closeSearch(){const m=document.getElementById('globalSearch');m.style.display='none';m.setAttribute('aria-hidden','true');}
 function renderSearchResults(q){
  const el=document.getElementById('globalSearchResults'); if(!el)return;
- const data=q?watches.filter(w=>[w.brand,w.collection,w.model,w.ref].join(' ').toLowerCase().includes(q.toLowerCase())).slice(0,8):watches.slice(0,6);
+ const data=q?watches.filter(w=>[w.brand,w.collection,w.officialModel,w.model,w.nickname,w.generation,w.ref,w.bracelet,w.bezel].join(' ').toLowerCase().includes(q.toLowerCase())).slice(0,8):watches.slice(0,6);
  el.innerHTML=data.map(w=>`<button data-search-watch="${w.ref}"><span><b>${w.brand}</b><small>${w.collection} ${w.model}</small></span><em>${w.ref}</em></button>`).join('');
  el.querySelectorAll('[data-search-watch]').forEach(x=>x.onclick=()=>{closeSearch();location.hash='#/watch/'+encodeURIComponent(x.dataset.searchWatch);});
 }
