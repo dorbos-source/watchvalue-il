@@ -13,3 +13,37 @@
 .image-search-preview{margin-top:12px;padding:10px;border:1px solid #293b32;border-radius:14px;display:flex;gap:12px;align-items:center;background:#09130f}
 .image-search-preview[hidden]{display:none}.image-search-preview img{width:62px;height:62px;object-fit:cover;border-radius:10px}.image-search-preview small{display:block;color:#91a49a;margin-top:3px}
 .search-loading{padding:18px;text-align:center;color:#a8b9b0}
+
+/* UX polish v12 */
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 0 4px rgba(92,230,162,.08)}
+.announcement b{font-weight:500;color:#71857a}
+.nav-market-cta{height:40px;display:flex;align-items:center;padding:0 15px;border-radius:11px;background:#edf4f0;color:#09130f;font-weight:800;font-size:13px}
+.nav-market-cta:hover{background:#fff}
+.hero-copy h1{max-width:760px}
+.hero-search{border:1px solid rgba(255,255,255,.12)}
+.hero-search:focus-within{box-shadow:0 0 0 4px rgba(92,230,162,.12),0 25px 60px rgba(0,0,0,.25)}
+.market-row:focus-visible,.brand-card:focus-visible,.watch-card:focus-visible,.cta-button:focus-visible,.soft-button:focus-visible,.icon-button:focus-visible,.nav-market-cta:focus-visible{outline:2px solid var(--green);outline-offset:3px}
+@media(max-width:760px){
+ .announcement{height:28px;font-size:9px;letter-spacing:.07em;padding:0 12px;white-space:nowrap;overflow:hidden}
+ .announcement b{display:none}
+ .nav-row{height:62px}
+ .nav-market-cta{display:none}
+ .hero-v2{padding:38px 0 34px}
+ .hero-layout{display:flex;flex-direction:column;gap:28px}
+ .hero-copy{text-align:center;width:100%}
+ .hero-copy h1{font-size:44px;line-height:.98;margin:12px auto 17px}
+ .hero-copy>p{font-size:16px;line-height:1.55;margin:auto}
+ .hero-search{height:58px;margin-top:24px;text-align:right}
+ .hero-search button{height:44px;padding:0 16px}
+ .popular-searches{justify-content:center}
+ .spotlight-card{width:100%;border-radius:22px}
+ .section-v2{padding:46px 0}
+ .section-head{align-items:flex-start}
+ .section-head h2{font-size:28px}
+ .trust-strip .shell{display:grid;grid-template-columns:1fr 1fr;padding:18px 0}
+ .trust-strip i{display:none}
+ .watch-layout{display:flex;flex-direction:column}
+ .watch-hero-art{min-height:410px}
+ .watch-title-row h1{font-size:35px}
+ .valuation-main strong{font-size:30px}
+}
