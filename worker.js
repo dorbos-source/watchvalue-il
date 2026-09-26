@@ -169,6 +169,30 @@ async function syncVerifiedObservations(){
   });
 }
 
+async function calculateWatchValueEstimates(){
+  return logRun('watchvalue_estimate',async()=>{
+    const {rows:watches}=await pool.query("select distinct watch_id from market_observations where is_verified=true and price_ils>0");
+    let written=0,skipped=0;
+    for(const item of watches){
+      const {rows}=await pool.query("select price_ils,source_key from market_observations where watch_id=$1 and is_verified=true and price_ils>0 order by price_ils",[item.watch_id]);
+      const sources=new Set(rows.map(x=>x.source_key).filter(Boolean)).size;
+      if(rows.length<3 || sources<2){skipped++;continue;}
+      const v=rows.map(x=>Number(x.price_ils)).sort((a,b)=>a-b);
+      const median=v.length%2?v[(v.length-1)/2]:(v[v.length/2-1]+v[v.length/2])/2;
+      const d=v.map(x=>Math.abs(x-median)).sort((a,b)=>a-b);
+      const mad=d.length%2?d[(d.length-1)/2]:(d[d.length/2-1]+d[d.length/2])/2;
+      const clean=mad===0?v:v.filter(x=>Math.abs(x-median)<=3*mad);
+      const value=clean.length%2?clean[(clean.length-1)/2]:(clean[clean.length/2-1]+clean[clean.length/2])/2;
+      const low=clean[Math.floor((clean.length-1)*0.25)];
+      const high=clean[Math.floor((clean.length-1)*0.75)];
+      const confidence=Math.min(95,35+Math.min(clean.length,20)*2+Math.min(sources,5)*8);
+      await pool.query("insert into watchvalue_estimates(watch_id,market_value_ils,low_ils,high_ils,confidence,observation_count,source_count,methodology_version,is_demo,details) values($1,$2,$3,$4,$5,$6,$7,'wv-median-mad-v1',false,$8::jsonb)",[item.watch_id,Math.round(value),Math.round(low),Math.round(high),confidence,clean.length,sources,JSON.stringify({verifiedOnly:true,outlierRule:'3x MAD',minimumObservations:3,minimumSources:2})]);
+      written++;
+    }
+    return {eligible:watches.length,written,skipped};
+  });
+}
+
 async function processQueue(){
   let processed=0;
   let ranQualityScan=false;
@@ -219,6 +243,7 @@ async function main(){
   await syncCoreCatalog();
   await syncCoreVariants();
   await syncVerifiedObservations();
+  await calculateWatchValueEstimates();
   const queue=await processQueue();
   if(!queue.ranQualityScan) await catalogQualityScan();
   console.log('WatchValue worker completed', queue);
