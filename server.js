@@ -102,6 +102,26 @@ app.get('/api/watch/:reference', async (req,res)=>{
   res.json(rows[0]);
 });
 
+app.get('/api/watch/:reference/market', async (req,res)=>{
+  if(!pool) return res.status(503).json({error:'Database unavailable'});
+  const {rows:[watch]}=await pool.query('select id from watches where lower(reference)=lower($1) limit 1',[req.params.reference]);
+  if(!watch) return res.status(404).json({error:'Reference not found'});
+  const [observations,estimate]=await Promise.all([
+    pool.query(`
+      select mo.observation_type,mo.price,mo.currency,mo.price_ils,mo.condition,mo.year,mo.full_set,
+             mo.country,mo.seller_type,mo.observed_at,mo.is_verified,s.name as source_name
+      from market_observations mo left join source_registry s on s.source_key=mo.source_key
+      where mo.watch_id=$1 order by mo.observed_at desc limit 100
+    `,[watch.id]),
+    pool.query(`
+      select market_value_ils,low_ils,high_ils,confidence,observation_count,source_count,
+             methodology_version,is_demo,as_of
+      from watchvalue_estimates where watch_id=$1 order by as_of desc limit 1
+    `,[watch.id])
+  ]);
+  res.json({estimate:estimate.rows[0]||null,observations:observations.rows});
+});
+
 app.get('/api/project-memory', async (_req, res) => {
   if (!pool) return res.json([]);
   const { rows } = await pool.query('select key,value,updated_at from project_memory order by key');
@@ -110,12 +130,14 @@ app.get('/api/project-memory', async (_req, res) => {
 
 app.get('/api/system/status', async (_req,res)=>{
   if(!pool) return res.status(503).json({ok:false});
-  const [catalog,prices,sources,runs,tasks]=await Promise.all([
+  const [catalog,prices,sources,runs,tasks,market,estimates]=await Promise.all([
     pool.query("select count(*)::int as watches,count(distinct brand_id)::int as brands from watches"),
     pool.query("select count(*)::int as snapshots,count(*) filter(where is_demo)::int as demo_snapshots,max(as_of) as latest_price_at from price_snapshots"),
     pool.query("select count(*)::int as sources,count(*) filter(where enabled)::int as enabled_sources from source_registry"),
     pool.query("select id,job_type,status,started_at,finished_at,records_seen,records_written,error from ingestion_runs order by started_at desc limit 5"),
-    pool.query("select status,count(*)::int as count from agent_tasks group by status order by status")
+    pool.query("select status,count(*)::int as count from agent_tasks group by status order by status"),
+    pool.query("select count(*)::int as observations,count(*) filter(where is_verified)::int as verified_observations,max(observed_at) as latest_observation_at from market_observations"),
+    pool.query("select count(*)::int as estimates,count(*) filter(where is_demo)::int as demo_estimates,max(as_of) as latest_estimate_at from watchvalue_estimates")
   ]);
   res.json({
     ok:true,
@@ -123,7 +145,9 @@ app.get('/api/system/status', async (_req,res)=>{
     prices:prices.rows[0],
     sources:sources.rows[0],
     recentRuns:runs.rows,
-    tasks:tasks.rows
+    tasks:tasks.rows,
+    market:market.rows[0],
+    estimates:estimates.rows[0]
   });
 });
 
