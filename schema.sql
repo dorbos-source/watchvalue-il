@@ -172,3 +172,41 @@ create table if not exists ingestion_runs (
 );
 
 create index if not exists ingestion_runs_started_idx on ingestion_runs(started_at desc);
+
+
+-- Normalized configuration layer: one official reference can have multiple dial/bracelet/bezel variants.
+create table if not exists watch_variants (
+  id bigserial primary key,
+  watch_id bigint not null references watches(id) on delete cascade,
+  variant_key text not null,
+  nickname text,
+  dial text,
+  bracelet text,
+  bezel text,
+  material text,
+  production_start int,
+  production_end int,
+  image_url text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique(watch_id, variant_key)
+);
+create index if not exists watch_variants_watch_idx on watch_variants(watch_id);
+create index if not exists watch_variants_key_idx on watch_variants(variant_key);
+
+-- Provenance for catalog facts so model/year/status data can be audited before being treated as authoritative.
+create table if not exists catalog_fact_sources (
+  id bigserial primary key,
+  watch_id bigint not null references watches(id) on delete cascade,
+  variant_id bigint references watch_variants(id) on delete cascade,
+  field_name text not null,
+  source_key text,
+  source_url text,
+  source_type text,
+  verified_at timestamptz,
+  confidence numeric(5,2),
+  notes text,
+  created_at timestamptz not null default now()
+);
+create index if not exists catalog_fact_sources_watch_idx on catalog_fact_sources(watch_id);
+create index if not exists catalog_fact_sources_variant_idx on catalog_fact_sources(variant_id);
