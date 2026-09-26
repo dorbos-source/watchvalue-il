@@ -135,6 +135,40 @@ async function syncCoreVariants(){
   });
 }
 
+async function syncVerifiedObservations(){
+  return logRun('verified_market_sync',async()=>{
+    const rows=JSON.parse(await fs.readFile(new URL('./market/verified-observations.json',import.meta.url),'utf8'));
+    await pool.query(`
+      insert into source_registry(source_key,name,source_type,base_url,enabled,usage_mode,notes,last_checked_at)
+      values('phillips_auction','Phillips Auctions','auction','https://www.phillips.com',true,'public_results',
+             'Public auction result pages; observations are stored with source URL and result type.',now())
+      on conflict(source_key) do update set name=excluded.name,source_type=excluded.source_type,
+        base_url=excluded.base_url,enabled=excluded.enabled,usage_mode=excluded.usage_mode,
+        notes=excluded.notes,last_checked_at=now()
+    `);
+    let written=0;
+    for(const row of rows){
+      const {rows:[watch]}=await pool.query('select id from watches where lower(reference)=lower($1)',[row.reference]);
+      if(!watch) continue;
+      await pool.query(`
+        insert into market_observations(
+          watch_id,source_key,source_observation_id,source_url,observation_type,price,currency,price_ils,
+          condition,year,full_set,country,seller_type,observed_at,is_verified,metadata
+        ) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,'auction_house',$13,$14,$15::jsonb)
+        on conflict(source_key,source_observation_id) where source_observation_id is not null do update set
+          source_url=excluded.source_url,observation_type=excluded.observation_type,price=excluded.price,
+          currency=excluded.currency,price_ils=excluded.price_ils,condition=excluded.condition,year=excluded.year,
+          full_set=excluded.full_set,country=excluded.country,observed_at=excluded.observed_at,
+          is_verified=excluded.is_verified,metadata=excluded.metadata,captured_at=now()
+      `,[watch.id,row.source_key,row.source_observation_id,row.source_url,row.observation_type,row.price,row.currency,
+          row.price_ils||null,row.condition||null,row.year||null,row.full_set??null,row.country||null,row.observed_at,
+          !!row.is_verified,JSON.stringify({import:'verified-public-seed'})]);
+      written++;
+    }
+    return {seen:rows.length,written};
+  });
+}
+
 async function processQueue(){
   const {rows}=await pool.query(`
     select id,task_type,payload from agent_tasks
@@ -163,6 +197,7 @@ async function main(){
   console.log('WatchValue worker starting');
   await syncCoreCatalog();
   await syncCoreVariants();
+  await syncVerifiedObservations();
   const processed=await processQueue();
   await catalogQualityScan();
   console.log('WatchValue worker completed', {processed});
