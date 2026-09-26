@@ -170,37 +170,58 @@ async function syncVerifiedObservations(){
 }
 
 async function processQueue(){
-  const {rows}=await pool.query(`
-    select id,task_type,payload from agent_tasks
-    where status='queued' and run_after<=now()
-    order by created_at asc
-    limit 10
-    for update skip locked
-  `);
-  for(const task of rows){
-    await pool.query("update agent_tasks set status='running',attempts=attempts+1,updated_at=now() where id=$1",[task.id]);
+  let processed=0;
+  let ranQualityScan=false;
+  while(processed<10){
+    const client=await pool.connect();
+    let task;
     try{
-      if(task.task_type==='catalog_quality_scan') await catalogQualityScan();
-      else if(task.task_type==='source_terms_review'){
+      await client.query('begin');
+      const {rows}=await client.query(`
+        select id,task_type,payload from agent_tasks
+        where status='queued' and run_after<=now()
+        order by created_at asc
+        limit 1
+        for update skip locked
+      `);
+      if(!rows.length){
+        await client.query('commit');
+        break;
+      }
+      task=rows[0];
+      await client.query("update agent_tasks set status='running',attempts=attempts+1,updated_at=now() where id=$1",[task.id]);
+      await client.query('commit');
+    }catch(error){
+      try{await client.query('rollback');}catch{}
+      throw error;
+    }finally{
+      client.release();
+    }
+
+    try{
+      if(task.task_type==='catalog_quality_scan'){
+        await catalogQualityScan();
+        ranQualityScan=true;
+      }else if(task.task_type==='source_terms_review'){
         await pool.query("update project_memory set value=$2::jsonb,updated_at=now() where key=$1",['source_review_state',JSON.stringify({status:'pending_human_or_agent_review',updatedAt:new Date().toISOString()})])
           .then(async r=>{if(!r.rowCount) await pool.query("insert into project_memory(key,value) values($1,$2::jsonb)",['source_review_state',JSON.stringify({status:'pending_human_or_agent_review',updatedAt:new Date().toISOString()})]);});
       }
-      await pool.query("update agent_tasks set status='done',updated_at=now() where id=$1",[task.id]);
+      await pool.query("update agent_tasks set status='done',last_error=null,updated_at=now() where id=$1",[task.id]);
     }catch(error){
       await pool.query("update agent_tasks set status='failed',last_error=$2,updated_at=now() where id=$1",[task.id,String(error?.stack||error)]);
     }
+    processed++;
   }
-  return rows.length;
+  return {processed,ranQualityScan};
 }
-
 async function main(){
   console.log('WatchValue worker starting');
   await syncCoreCatalog();
   await syncCoreVariants();
   await syncVerifiedObservations();
-  const processed=await processQueue();
-  await catalogQualityScan();
-  console.log('WatchValue worker completed', {processed});
+  const queue=await processQueue();
+  if(!queue.ranQualityScan) await catalogQualityScan();
+  console.log('WatchValue worker completed', queue);
   await pool.end();
 }
 
