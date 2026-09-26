@@ -1,0 +1,48 @@
+[
+  {
+    "reference": "126500LN",
+    "variants": [
+      {
+        "variant_key": "m126500ln-0001",
+        "dial": "White, black counter rings",
+        "bracelet": "Oyster",
+        "bezel": "Black Cerachrom tachymetric",
+        "material": "Oystersteel",
+        "source_url": "https://www.rolex.com/en-us/watches/cosmograph-daytona/m126500ln-0001",
+        "source_type": "official"
+      },
+      {
+        "variant_key": "m126500ln-0002",
+        "dial": "Black, steel counter rings",
+        "bracelet": "Oyster",
+        "bezel": "Black Cerachrom tachymetric",
+        "material": "Oystersteel",
+        "source_url": "https://www.rolex.com/he/watches/cosmograph-daytona/m126500ln-0002",
+        "source_type": "official"
+      }
+    ]
+  },
+  {
+    "reference": "126710BLNR",
+    "variants": [
+      {
+        "variant_key": "m126710blnr-0002",
+        "dial": "Black",
+        "bracelet": "Jubilee",
+        "bezel": "Blue / Black Cerachrom",
+        "material": "Oystersteel",
+        "source_url": "https://www.rolex.com/watches/gmt-master-ii/m126710blnr-0002",
+        "source_type": "official"
+      },
+      {
+        "variant_key": "m126710blnr-0003",
+        "dial": "Black",
+        "bracelet": "Oyster",
+        "bezel": "Blue / Black Cerachrom",
+        "material": "Oystersteel",
+        "source_url": "https://www.rolex.com/en-us/watches/gmt-master-ii/m126710blnr-0003",
+        "source_type": "official"
+      }
+    ]
+  }
+]
