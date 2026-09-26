@@ -1,0 +1,34 @@
+[
+  {
+    "reference": "126500LN",
+    "source_key": "phillips_auction",
+    "source_observation_id": "phillips-210140",
+    "source_url": "https://www.phillips.com/detail/rolex/210140",
+    "observation_type": "auction_result",
+    "price": 40640,
+    "currency": "USD",
+    "price_ils": 123886.72,
+    "condition": "brand new / unworn",
+    "year": 2024,
+    "full_set": true,
+    "country": "US",
+    "observed_at": "2024-12-08T12:00:00Z",
+    "is_verified": true
+  },
+  {
+    "reference": "126710BLRO",
+    "source_key": "phillips_auction",
+    "source_observation_id": "phillips-232301",
+    "source_url": "https://www.phillips.com/detail/rolex/232301",
+    "observation_type": "auction_result",
+    "price": 27940,
+    "currency": "USD",
+    "price_ils": 85168.91,
+    "condition": "pre-owned",
+    "year": 2021,
+    "full_set": true,
+    "country": "US",
+    "observed_at": "2026-06-14T12:00:00Z",
+    "is_verified": true
+  }
+]
