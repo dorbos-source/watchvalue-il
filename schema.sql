@@ -210,3 +210,49 @@ create table if not exists catalog_fact_sources (
 );
 create index if not exists catalog_fact_sources_watch_idx on catalog_fact_sources(watch_id);
 create index if not exists catalog_fact_sources_variant_idx on catalog_fact_sources(variant_id);
+
+
+-- Raw market observations stay separate from calculated WatchValue estimates.
+create table if not exists market_observations (
+  id bigserial primary key,
+  watch_id bigint not null references watches(id) on delete cascade,
+  variant_id bigint references watch_variants(id) on delete set null,
+  source_key text references source_registry(source_key) on delete set null,
+  source_observation_id text,
+  source_url text,
+  observation_type text not null check (observation_type in ('asking','transaction','auction_result','dealer_bid','dealer_ask','private_sale')),
+  price numeric(14,2) not null check (price > 0),
+  currency text not null,
+  price_ils numeric(14,2),
+  condition text,
+  year int,
+  full_set boolean,
+  country text,
+  seller_type text,
+  observed_at timestamptz not null default now(),
+  captured_at timestamptz not null default now(),
+  is_verified boolean not null default false,
+  metadata jsonb not null default '{}'::jsonb
+);
+create unique index if not exists market_observations_source_id_uidx
+  on market_observations(source_key,source_observation_id)
+  where source_observation_id is not null;
+create index if not exists market_observations_watch_time_idx on market_observations(watch_id,observed_at desc);
+create index if not exists market_observations_type_idx on market_observations(observation_type);
+
+create table if not exists watchvalue_estimates (
+  id bigserial primary key,
+  watch_id bigint not null references watches(id) on delete cascade,
+  variant_id bigint references watch_variants(id) on delete set null,
+  as_of timestamptz not null default now(),
+  market_value_ils numeric(14,2) not null,
+  low_ils numeric(14,2),
+  high_ils numeric(14,2),
+  confidence numeric(5,2),
+  observation_count int not null default 0,
+  source_count int not null default 0,
+  methodology_version text not null,
+  is_demo boolean not null default false,
+  details jsonb not null default '{}'::jsonb
+);
+create index if not exists watchvalue_estimates_watch_time_idx on watchvalue_estimates(watch_id,as_of desc);
