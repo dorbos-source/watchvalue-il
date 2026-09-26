@@ -75,6 +75,19 @@ app.get('/api/watches', async (req, res) => {
   res.json(rows);
 });
 
+app.get('/api/watch/:reference/variants', async (req,res)=>{
+  if(!pool) return res.json([]);
+  const {rows}=await pool.query(`
+    select v.id,v.variant_key,v.nickname,v.dial,v.bracelet,v.bezel,v.material,
+           v.production_start,v.production_end,v.image_url
+    from watch_variants v
+    join watches w on w.id=v.watch_id
+    where lower(w.reference)=lower($1)
+    order by v.variant_key
+  `,[req.params.reference]);
+  res.json(rows);
+});
+
 app.get('/api/watch/:reference', async (req,res)=>{
   if(!pool) return res.status(404).json({error:'Database unavailable'});
   const {rows}=await pool.query(`
