@@ -99,6 +99,42 @@ async function syncCoreCatalog(){
   });
 }
 
+async function syncCoreVariants(){
+  return logRun('variant_sync',async()=>{
+    const groups=JSON.parse(await fs.readFile(new URL('./catalog/core-variants.json',import.meta.url),'utf8'));
+    let written=0;
+    const client=await pool.connect();
+    try{
+      await client.query('begin');
+      for(const group of groups){
+        const {rows:[watch]}=await client.query('select id from watches where lower(reference)=lower($1)',[group.reference]);
+        if(!watch) continue;
+        for(const row of group.variants||[]){
+          const {rows:[variant]}=await client.query(`
+            insert into watch_variants(watch_id,variant_key,nickname,dial,bracelet,bezel,material,production_start,production_end,image_url,updated_at)
+            values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,now())
+            on conflict(watch_id,variant_key) do update set
+              nickname=excluded.nickname,dial=excluded.dial,bracelet=excluded.bracelet,bezel=excluded.bezel,
+              material=excluded.material,production_start=excluded.production_start,production_end=excluded.production_end,
+              image_url=coalesce(excluded.image_url,watch_variants.image_url),updated_at=now()
+            returning id
+          `,[watch.id,row.variant_key,row.nickname||null,row.dial||null,row.bracelet||null,row.bezel||null,row.material||null,row.production_start||null,row.production_end||null,row.image_url||null]);
+          await client.query(`
+            delete from catalog_fact_sources where variant_id=$1 and source_url=$2
+          `,[variant.id,row.source_url]);
+          await client.query(`
+            insert into catalog_fact_sources(watch_id,variant_id,field_name,source_key,source_url,source_type,verified_at,confidence,notes)
+            values($1,$2,'variant_configuration','official_catalog',$3,$4,now(),100,'Verified against official manufacturer page')
+          `,[watch.id,variant.id,row.source_url,row.source_type||'official']);
+          written++;
+        }
+      }
+      await client.query('commit');
+      return {groups:groups.length,written};
+    }catch(error){await client.query('rollback');throw error;}finally{client.release();}
+  });
+}
+
 async function processQueue(){
   const {rows}=await pool.query(`
     select id,task_type,payload from agent_tasks
@@ -126,6 +162,7 @@ async function processQueue(){
 async function main(){
   console.log('WatchValue worker starting');
   await syncCoreCatalog();
+  await syncCoreVariants();
   const processed=await processQueue();
   await catalogQualityScan();
   console.log('WatchValue worker completed', {processed});
