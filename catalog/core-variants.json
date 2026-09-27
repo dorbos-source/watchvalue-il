@@ -263,5 +263,32 @@
         "verified_at": "2026-09-27T12:42:32.240Z"
       }
     ]
+  },
+  {
+    "reference": "226570",
+    "variants": [
+      {
+        "variant_key": "m226570-0001",
+        "dial": "White",
+        "bracelet": "Oyster",
+        "bezel": "Fixed, 24-hour graduated",
+        "material": "Oystersteel",
+        "source_url": "https://www.rolex.com/watches/explorer-ii/m226570-0001",
+        "source_type": "official",
+        "source_key": "rolex_official",
+        "verified_at": "2026-09-27T16:57:35+03:00"
+      },
+      {
+        "variant_key": "m226570-0002",
+        "dial": "Black",
+        "bracelet": "Oyster",
+        "bezel": "Fixed, 24-hour graduated",
+        "material": "Oystersteel",
+        "source_url": "https://www.rolex.com/en-gb/watches/explorer-ii/m226570-0002",
+        "source_type": "official",
+        "source_key": "rolex_official",
+        "verified_at": "2026-09-27T16:57:35+03:00"
+      }
+    ]
   }
 ]
