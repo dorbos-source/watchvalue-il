@@ -290,5 +290,70 @@
         "verified_at": "2026-09-27T16:57:35+03:00"
       }
     ]
+  },
+  {
+    "reference": "126622",
+    "variants": [
+      {
+        "variant_key": "m126622-0001",
+        "dial": "Slate",
+        "bracelet": "Oyster",
+        "bezel": "Bidirectional rotatable 60-minute graduated platinum",
+        "material": "Oystersteel / Platinum",
+        "source_url": "https://www.rolex.com/watches/yacht-master/m126622-0001",
+        "source_type": "official",
+        "source_key": "rolex_official",
+        "verified_at": "2026-09-27T16:15:00Z"
+      },
+      {
+        "variant_key": "m126622-0002",
+        "dial": "Bright blue",
+        "bracelet": "Oyster",
+        "bezel": "Bidirectional rotatable 60-minute graduated platinum",
+        "material": "Oystersteel / Platinum",
+        "source_url": "https://www.rolex.com/en-us/watches/yacht-master/m126622-0002",
+        "source_type": "official",
+        "source_key": "rolex_official",
+        "verified_at": "2026-09-27T16:15:00Z"
+      }
+    ]
+  },
+  {
+    "reference": "336934",
+    "variants": [
+      {
+        "variant_key": "m336934-0007",
+        "dial": "Bright black",
+        "bracelet": "Oyster",
+        "bezel": "Fluted, bidirectional rotatable Rolex Ring Command",
+        "material": "White Rolesor - Oystersteel and white gold",
+        "source_url": "https://www.rolex.com/watches/sky-dweller/m336934-0007",
+        "source_type": "official",
+        "source_key": "rolex_official",
+        "verified_at": "2026-09-27T16:15:00Z"
+      },
+      {
+        "variant_key": "m336934-0008",
+        "dial": "Bright black",
+        "bracelet": "Jubilee",
+        "bezel": "Fluted, bidirectional rotatable Rolex Ring Command",
+        "material": "White Rolesor - Oystersteel and white gold",
+        "source_url": "https://www.rolex.com/watches/sky-dweller/m336934-0008",
+        "source_type": "official",
+        "source_key": "rolex_official",
+        "verified_at": "2026-09-27T16:15:00Z"
+      },
+      {
+        "variant_key": "m336934-0004",
+        "dial": "Intense white",
+        "bracelet": "Jubilee",
+        "bezel": "Fluted, bidirectional rotatable Rolex Ring Command",
+        "material": "White Rolesor - Oystersteel and white gold",
+        "source_url": "https://www.rolex.com/en-us/watches/sky-dweller/m336934-0004",
+        "source_type": "official",
+        "source_key": "rolex_official",
+        "verified_at": "2026-09-27T16:15:00Z"
+      }
+    ]
   }
 ]
