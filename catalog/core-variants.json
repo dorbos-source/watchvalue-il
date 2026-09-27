@@ -151,5 +151,70 @@
         "verified_at": "2026-09-27T15:26:00+03:00"
       }
     ]
+  },
+  {
+    "reference": "124060",
+    "variants": [
+      {
+        "variant_key": "m124060-0001",
+        "dial": "Black",
+        "bracelet": "Oyster",
+        "bezel": "Black Cerachrom, unidirectional 60-minute graduated",
+        "material": "Oystersteel",
+        "source_url": "https://www.rolex.com/watches/submariner/m124060-0001",
+        "source_type": "official",
+        "source_key": "rolex_official",
+        "verified_at": "2026-09-27T12:41:10.350Z"
+      }
+    ]
+  },
+  {
+    "reference": "126334",
+    "variants": [
+      {
+        "variant_key": "m126334-0034",
+        "dial": "Green ombré",
+        "bracelet": "Jubilee",
+        "bezel": "Fluted",
+        "material": "White Rolesor - Oystersteel and white gold",
+        "source_url": "https://www.rolex.com/watches/datejust/m126334-0034",
+        "source_type": "official",
+        "source_key": "rolex_official",
+        "verified_at": "2026-09-27T12:41:10.350Z"
+      },
+      {
+        "variant_key": "m126334-0014",
+        "dial": "Slate",
+        "bracelet": "Jubilee",
+        "bezel": "Fluted",
+        "material": "White Rolesor - Oystersteel and white gold",
+        "source_url": "https://www.rolex.com/watches/datejust/m126334-0014",
+        "source_type": "official",
+        "source_key": "rolex_official",
+        "verified_at": "2026-09-27T12:41:10.350Z"
+      },
+      {
+        "variant_key": "m126334-0018",
+        "dial": "Bright black",
+        "bracelet": "Jubilee",
+        "bezel": "Fluted",
+        "material": "White Rolesor - Oystersteel and white gold",
+        "source_url": "https://www.rolex.com/watches/datejust/m126334-0018",
+        "source_type": "official",
+        "source_key": "rolex_official",
+        "verified_at": "2026-09-27T12:41:10.350Z"
+      },
+      {
+        "variant_key": "m126334-0035",
+        "dial": "White",
+        "bracelet": "Oyster",
+        "bezel": "Fluted",
+        "material": "White Rolesor - Oystersteel and white gold",
+        "source_url": "https://www.rolex.com/watches/datejust/m126334-0035",
+        "source_type": "official",
+        "source_key": "rolex_official",
+        "verified_at": "2026-09-27T12:41:10.350Z"
+      }
+    ]
   }
 ]
