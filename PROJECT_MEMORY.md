@@ -85,3 +85,6 @@ System should automatically ingest/update catalog data, collect permitted market
 
 ## Deployment sync
 - 2026-09-27: Triggered fresh Railway build after verifying both production services track GitHub `main`; latest FX, retail, freshness and premium UI work must be built from HEAD rather than snapshot redeploy.
+
+## Provenance QA rule — 2026-09-27
+- Official catalog variants must use manufacturer-owned source URLs. Rolex official rows must resolve to rolex.com and Cartier official rows to cartier.com. Reject mismatched hosts during catalog QA before deployment.
