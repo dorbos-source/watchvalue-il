@@ -72,3 +72,12 @@ System should automatically ingest/update catalog data, collect permitted market
 - Railway deployment
 - PostgreSQL catalog/prices/subscriptions/jobs/agent memory
 - Background jobs / scheduled ingestion
+
+
+## Catalog focus — 2026-09-27
+- Phase 1 catalog/data scope is Rolex and Cartier only.
+- Do not spend ingestion/enrichment effort on other brands until Rolex + Cartier coverage is deep and quality-checked.
+- Target: current + discontinued references, official variants/configurations, MSRP/retail where officially available, and separated secondary-market observations.
+- Rolex current collection baseline must be reconciled against the official Rolex model finder.
+- Cartier current collection baseline must be reconciled against Cartier's official all-watches catalog.
+- Secondary prices must preserve observation type (asking vs transaction vs auction result); never treat asks as completed sales.
