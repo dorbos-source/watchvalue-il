@@ -86,7 +86,7 @@ insert into source_registry(source_key,name,source_type,base_url,enabled,usage_m
 ('cartier_official','Cartier Official','official','https://www.cartier.com',false,'metadata','Official catalog/reference metadata only; enable adapter after source terms are reviewed.'),
 ('omega_official','Omega Official','official','https://www.omegawatches.com',false,'metadata','Official catalog/reference metadata only; enable adapter after source terms are reviewed.'),
 ('manual_market_seed','WatchValue Curated Market Seed','marketplace',null,true,'demo','Temporary demo market observations only. Replace with permitted live data adapters.'),
-('padani_cartier_il','Padani Cartier Israel','authorized_retailer','https://padani.com/collections/cartier',false,'retail','Israeli Cartier retail/catalog source. Current public catalog exposes ILS pricing; enable automated adapter only after usage/terms review.'),
+('padani_cartier_il','Padani Cartier Israel','dealer','https://padani.com/collections/cartier',false,'retail','Israeli Cartier retail/catalog source. Current public catalog exposes ILS pricing; enable automated adapter only after usage/terms review.'),
 ('chrono24_market','Chrono24','marketplace','https://www.chrono24.com',false,'asking','Secondary-market asking/listing depth. Keep asking prices separate from completed transactions; enable automated adapter only after usage/terms review.'),
 ('phillips_auctions','Phillips Auctions','auction','https://www.phillips.com',true,'transaction','Public completed auction-result observations; retain source URL and sale date.'),
 ('boi_fx','Bank of Israel FX','fx','https://www.boi.org.il',false,'fx','Official ILS FX normalization source; historical rate provenance required before conversion.')
