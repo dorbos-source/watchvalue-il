@@ -1,0 +1,95 @@
+[
+  {
+    "reference": "126622",
+    "variant_key": "m126622-0001",
+    "source_key": "rolex_official",
+    "source_url": "https://www.rolex.com/watches/yacht-master/m126622-0001",
+    "price": 13200,
+    "currency": "USD",
+    "market_country": "US",
+    "includes_tax": null,
+    "effective_at": "2026-09-27T16:20:00Z",
+    "is_official": true,
+    "metadata": {
+      "price_type": "official_retail_list_price",
+      "evidence": "manufacturer_product_page",
+      "dial": "Slate",
+      "captured_by": "watchvalue_curated_import"
+    }
+  },
+  {
+    "reference": "126622",
+    "variant_key": "m126622-0002",
+    "source_key": "rolex_official",
+    "source_url": "https://www.rolex.com/en-us/watches/yacht-master/m126622-0002",
+    "price": 13200,
+    "currency": "USD",
+    "market_country": "US",
+    "includes_tax": null,
+    "effective_at": "2026-09-27T16:20:00Z",
+    "is_official": true,
+    "metadata": {
+      "price_type": "official_retail_list_price",
+      "evidence": "manufacturer_product_page",
+      "dial": "Bright blue",
+      "captured_by": "watchvalue_curated_import"
+    }
+  },
+  {
+    "reference": "336934",
+    "variant_key": "m336934-0007",
+    "source_key": "rolex_official",
+    "source_url": "https://www.rolex.com/watches/sky-dweller/m336934-0007",
+    "price": 17750,
+    "currency": "USD",
+    "market_country": "US",
+    "includes_tax": null,
+    "effective_at": "2026-09-27T16:20:00Z",
+    "is_official": true,
+    "metadata": {
+      "price_type": "official_retail_list_price",
+      "evidence": "manufacturer_product_page",
+      "dial": "Bright black",
+      "bracelet": "Oyster",
+      "captured_by": "watchvalue_curated_import"
+    }
+  },
+  {
+    "reference": "336934",
+    "variant_key": "m336934-0008",
+    "source_key": "rolex_official",
+    "source_url": "https://www.rolex.com/watches/sky-dweller/m336934-0008",
+    "price": 17950,
+    "currency": "USD",
+    "market_country": "US",
+    "includes_tax": null,
+    "effective_at": "2026-09-27T16:20:00Z",
+    "is_official": true,
+    "metadata": {
+      "price_type": "official_retail_list_price",
+      "evidence": "manufacturer_product_page",
+      "dial": "Bright black",
+      "bracelet": "Jubilee",
+      "captured_by": "watchvalue_curated_import"
+    }
+  },
+  {
+    "reference": "336934",
+    "variant_key": "m336934-0004",
+    "source_key": "rolex_official",
+    "source_url": "https://www.rolex.com/en-us/watches/sky-dweller/m336934-0004",
+    "price": 17950,
+    "currency": "USD",
+    "market_country": "US",
+    "includes_tax": null,
+    "effective_at": "2026-09-27T16:20:00Z",
+    "is_official": true,
+    "metadata": {
+      "price_type": "official_retail_list_price",
+      "evidence": "manufacturer_product_page",
+      "dial": "Intense white",
+      "bracelet": "Jubilee",
+      "captured_by": "watchvalue_curated_import"
+    }
+  }
+]
