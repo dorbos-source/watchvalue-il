@@ -68,3 +68,19 @@ body{background:radial-gradient(circle at 72% -10%,rgba(216,186,112,.07),transpa
 .nav-market-cta,.cta-button,.hero-search button{background:linear-gradient(135deg,#e5cf8d,#b9954d);color:#171207}
 .hero-search{background:#f7f6f1}
 .premium-banner{border-color:#514a34;background:radial-gradient(circle at 12% 20%,rgba(216,186,112,.11),transparent 30%),linear-gradient(135deg,#14150f,#0a0d0a)}
+
+
+/* Product polish v14 */
+.shell{width:min(1240px,calc(100% - 40px))}
+.topbar{box-shadow:0 10px 40px rgba(0,0,0,.16)}
+.nav-row{height:76px}.desktop-nav a{position:relative;padding:28px 0}.desktop-nav a:after{content:"";position:absolute;right:0;left:100%;bottom:18px;height:1px;background:var(--gold);transition:.2s}.desktop-nav a:hover:after{left:0}
+.hero-v2{min-height:680px;display:flex;align-items:center}.hero-copy>p{max-width:590px}.hero-search{max-width:670px}
+.spotlight-card{transition:transform .25s,border-color .25s}.spotlight-card:hover{transform:translateY(-4px);border-color:#62583b}
+.trust-strip{background:rgba(10,12,10,.72)}.trust-strip b{font-size:14px}.trust-strip span{font-size:12px}
+.section-v2{padding:82px 0}.section-head{margin-bottom:30px}.section-head h2{font-size:38px}.section-head p{font-size:15px}
+.market-shell{border-radius:22px}.market-headrow{height:48px;padding:0 22px}.market-row{min-height:92px;padding:11px 22px}.thumb{width:48px;height:48px;border-radius:50%;background:radial-gradient(circle,#20251f,#0c0f0d);border-color:#403a29;color:#dcc57f}.market-cell b{font-size:14px}.row-arrow{transition:transform .2s}.market-row:hover .row-arrow{transform:translateX(-4px)}
+.brand-grid-v2{grid-template-columns:repeat(2,1fr);gap:14px}.brand-card{min-height:112px;padding:22px}.brand-monogram{width:52px;height:52px;border-radius:50%;background:#12150f;border-color:#4a422d;color:#dec77e}.brand-card b{font-size:17px}.brand-card small{font-size:11px}.brand-count{font-size:11px}
+.watch-layout{gap:42px}.watch-hero-art{position:sticky;top:108px;height:calc(100vh - 140px);min-height:600px;max-height:780px}.watch-info{padding:16px 0}.valuation-card{padding:24px;margin-top:28px}.valuation-main strong{font-size:42px}.price-trio>div,.spec-grid>div{padding:16px}.chart-panel{padding:21px}.main-chart{height:190px}.insight-card{padding:22px}
+.price-trio>div,.spec-grid>div,.chart-panel,.insight-card{transition:border-color .2s}.price-trio>div:hover,.spec-grid>div:hover,.chart-panel:hover,.insight-card:hover{border-color:#4b4938}
+@media(max-width:900px){.shell{width:min(100% - 28px,1240px)}.nav-row{height:66px}.hero-v2{min-height:auto}.section-v2{padding:54px 0}.brand-grid-v2{grid-template-columns:1fr 1fr}.watch-hero-art{position:relative;top:auto;height:auto;min-height:460px;max-height:none}}
+@media(max-width:600px){.shell{width:min(100% - 20px,1240px)}.hero-copy h1{font-size:48px}.hero-copy>p{font-size:15px}.section-head h2{font-size:30px}.market-row{min-height:78px;padding:9px 9px}.thumb{width:40px;height:40px}.brand-grid-v2{grid-template-columns:1fr}.brand-card{min-height:92px;padding:16px}.watch-hero-art{min-height:400px;border-radius:20px}.valuation-card{padding:18px}.valuation-main strong{font-size:32px}.main-chart{height:155px}}
