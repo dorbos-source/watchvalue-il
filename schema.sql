@@ -299,3 +299,24 @@ create index if not exists fx_rates_pair_date_idx on fx_rates(base_currency,quot
 alter table market_observations add column if not exists fx_rate numeric(18,8);
 alter table market_observations add column if not exists fx_rate_date date;
 alter table market_observations add column if not exists fx_source_key text;
+
+
+-- Refresh/freshness state for continuously updated market sources.
+create table if not exists source_refresh_state (
+  source_key text primary key,
+  last_attempt_at timestamptz,
+  last_success_at timestamptz,
+  next_refresh_at timestamptz,
+  refresh_interval_minutes integer not null default 360 check(refresh_interval_minutes>=5),
+  consecutive_failures integer not null default 0,
+  last_error text,
+  rows_seen integer not null default 0,
+  rows_written integer not null default 0,
+  updated_at timestamptz not null default now()
+);
+
+alter table watchvalue_estimates add column if not exists data_freshness_at timestamptz;
+alter table watchvalue_estimates add column if not exists newest_observation_at timestamptz;
+alter table watchvalue_estimates add column if not exists oldest_observation_at timestamptz;
+
+create index if not exists market_observations_captured_idx on market_observations(captured_at desc);
