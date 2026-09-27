@@ -170,6 +170,52 @@ async function syncVerifiedObservations(){
   });
 }
 
+
+async function syncVerifiedRetailPrices(){
+  return logRun('verified_retail_sync',async()=>{
+    const rows=JSON.parse(await fs.readFile(new URL('./market/verified-retail-prices.json',import.meta.url),'utf8'));
+    let written=0;
+    const client=await pool.connect();
+    try{
+      await client.query('begin');
+      for(const row of rows){
+        const {rows:[watch]}=await client.query('select id from watches where lower(reference)=lower($1)',[row.reference]);
+        if(!watch) continue;
+        const {rows:[variant]}=await client.query(
+          'select id from watch_variants where watch_id=$1 and lower(variant_key)=lower($2) limit 1',
+          [watch.id,row.variant_key]
+        );
+        await client.query(`
+          delete from retail_prices
+          where watch_id=$1
+            and (($2::bigint is null and variant_id is null) or variant_id=$2)
+            and source_key=$3 and source_url=$4 and currency=$5
+            and market_country is not distinct from $6
+            and effective_at=$7::timestamptz
+        `,[watch.id,variant?.id||null,row.source_key,row.source_url,row.currency,row.market_country||null,row.effective_at]);
+        await client.query(`
+          insert into retail_prices(
+            watch_id,variant_id,source_key,source_url,price,currency,market_country,
+            includes_tax,effective_at,captured_at,is_official,metadata
+          ) values($1,$2,$3,$4,$5,$6,$7,$8,$9::timestamptz,now(),$10,$11::jsonb)
+        `,[
+          watch.id,variant?.id||null,row.source_key,row.source_url,row.price,row.currency,
+          row.market_country||null,row.includes_tax??null,row.effective_at,!!row.is_official,
+          JSON.stringify({...row.metadata,variant_key:row.variant_key,curated_provenance:true})
+        ]);
+        written++;
+      }
+      await client.query('commit');
+      return {seen:rows.length,written};
+    }catch(error){
+      await client.query('rollback');
+      throw error;
+    }finally{
+      client.release();
+    }
+  });
+}
+
 async function calculateWatchValueEstimates(){
   return logRun('watchvalue_estimate',async()=>{
     const {rows:watches}=await pool.query("select distinct watch_id from market_observations where is_verified=true and price_ils>0 and (currency='ILS' or (fx_rate is not null and fx_source_key is not null))");
@@ -299,6 +345,7 @@ async function main(){
   await syncCoreCatalog();
   await syncCoreVariants();
   await sourceFreshnessHeartbeat('phillips_auction',syncVerifiedObservations);
+  await syncVerifiedRetailPrices();
   await calculateWatchValueEstimates();
   const queue=await processQueue();
   if(!queue.ranQualityScan) await catalogQualityScan();
