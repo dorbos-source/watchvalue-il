@@ -125,7 +125,7 @@ async function syncCoreVariants(){
           await client.query(`
             insert into catalog_fact_sources(watch_id,variant_id,field_name,source_key,source_url,source_type,verified_at,confidence,notes)
             values($1,$2,'variant_configuration',$5,$3,$4,now(),100,'Verified against official manufacturer page')
-          `,[watch.id,variant.id,row.source_url,row.source_type||'official']);
+          `,[watch.id,variant.id,row.source_url,row.source_type||'official',row.source_key||'official_catalog']);
           written++;
         }
       }
