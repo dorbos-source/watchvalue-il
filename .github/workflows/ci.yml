@@ -1,0 +1,42 @@
+name: WatchValue CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: JavaScript syntax
+        run: |
+          node --check server.js
+          node --check worker.js
+          node --check app.js
+          node --check catalog/import-catalog.js
+
+      - name: JSON parse
+        run: |
+          node -e "JSON.parse(require('fs').readFileSync('catalog/core-references.json','utf8'))"
+          node -e "JSON.parse(require('fs').readFileSync('catalog/core-variants.json','utf8'))"
+          node -e "JSON.parse(require('fs').readFileSync('market/verified-observations.json','utf8'))"
+
+      - name: Catalog and provenance QA
+        run: npm run qa:catalog
