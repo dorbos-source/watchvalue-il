@@ -108,5 +108,48 @@
         "source_key": "cartier_official"
       }
     ]
+  },
+  {
+    "reference": "126720VTNR",
+    "variants": [
+      {
+        "variant_key": "m126720vtnr-0001",
+        "dial": "Black",
+        "bracelet": "Oyster",
+        "bezel": "Green / Black Cerachrom",
+        "material": "Oystersteel",
+        "source_url": "https://www.rolex.com/watches/gmt-master-ii/m126720vtnr-0001",
+        "source_type": "official",
+        "source_key": "rolex_official",
+        "verified_at": "2026-09-27T15:26:00+03:00"
+      },
+      {
+        "variant_key": "m126720vtnr-0002",
+        "dial": "Black",
+        "bracelet": "Jubilee",
+        "bezel": "Green / Black Cerachrom",
+        "material": "Oystersteel",
+        "source_url": "https://www.rolex.com/en-us/watches/gmt-master-ii/m126720vtnr-0002",
+        "source_type": "official",
+        "source_key": "rolex_official",
+        "verified_at": "2026-09-27T15:26:00+03:00"
+      }
+    ]
+  },
+  {
+    "reference": "126610LV",
+    "variants": [
+      {
+        "variant_key": "m126610lv-0002",
+        "dial": "Black",
+        "bracelet": "Oyster",
+        "bezel": "Green Cerachrom",
+        "material": "Oystersteel",
+        "source_url": "https://www.rolex.com/en-us/watches/submariner/m126610lv-0002",
+        "source_type": "official",
+        "source_key": "rolex_official",
+        "verified_at": "2026-09-27T15:26:00+03:00"
+      }
+    ]
   }
 ]
