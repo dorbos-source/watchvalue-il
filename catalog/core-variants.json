@@ -269,6 +269,39 @@
         "source_type": "official",
         "source_key": "rolex_official",
         "verified_at": "2026-09-27T18:00:00Z"
+      },
+      {
+        "variant_key": "m126334-0003",
+        "dial": "Silver",
+        "bracelet": "Oyster",
+        "bezel": "Fluted",
+        "material": "White Rolesor - Oystersteel and white gold",
+        "source_url": "https://www.rolex.com/watches/datejust/m126334-0003",
+        "source_type": "official",
+        "source_key": "rolex_official",
+        "verified_at": "2026-09-27T21:05:00Z"
+      },
+      {
+        "variant_key": "m126334-0010",
+        "dial": "White",
+        "bracelet": "Jubilee",
+        "bezel": "Fluted",
+        "material": "White Rolesor - Oystersteel and white gold",
+        "source_url": "https://www.rolex.com/fr/watches/datejust/m126334-0010",
+        "source_type": "official",
+        "source_key": "rolex_official",
+        "verified_at": "2026-09-27T21:05:00Z"
+      },
+      {
+        "variant_key": "m126334-0011",
+        "dial": "Bright black set with diamonds",
+        "bracelet": "Oyster",
+        "bezel": "Fluted",
+        "material": "White Rolesor - Oystersteel and white gold",
+        "source_url": "https://www.rolex.com/it/watches/datejust/m126334-0011",
+        "source_type": "official",
+        "source_key": "rolex_official",
+        "verified_at": "2026-09-27T21:05:00Z"
       }
     ]
   },
