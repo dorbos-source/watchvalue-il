@@ -2,9 +2,11 @@ import fs from 'node:fs';
 
 const refsPath='catalog/core-references.json';
 const varsPath='catalog/core-variants.json';
+const retailPath='market/verified-retail-prices.json';
 
 const refs=JSON.parse(fs.readFileSync(refsPath,'utf8'));
 const groups=JSON.parse(fs.readFileSync(varsPath,'utf8'));
+const retail=JSON.parse(fs.readFileSync(retailPath,'utf8'));
 
 const errors=[];
 const warnings=[];
@@ -47,6 +49,21 @@ for(const [gi,group] of groups.entries()){
   }
 }
 
+for(const [i,row] of retail.entries()){
+  const prefix=`${retailPath}[${i}]`;
+  const ref=String(row.reference||'').trim();
+  const vk=String(row.variant_key||'').trim();
+  if(!ref || !refKeys.has(ref.toLowerCase())) errors.push(`${prefix}: unknown/missing reference ${ref}`);
+  if(!vk || !variantKeys.has(`${ref.toLowerCase()}::${vk.toLowerCase()}`)) errors.push(`${prefix}: unknown/missing variant_key ${vk}`);
+  if(!row.source_url) errors.push(`${prefix}: missing source_url`);
+  else { try { new URL(row.source_url); } catch { errors.push(`${prefix}: invalid source_url`); } }
+  if(!row.source_key) errors.push(`${prefix}: missing source_key`);
+  if(!(Number(row.price)>0)) errors.push(`${prefix}: invalid price`);
+  if(!row.currency) errors.push(`${prefix}: missing currency`);
+  if(!row.effective_at || Number.isNaN(Date.parse(row.effective_at))) errors.push(`${prefix}: invalid effective_at`);
+  if(row.is_official!==true) errors.push(`${prefix}: curated official retail row must set is_official=true`);
+}
+
 const text=fs.readFileSync('seed.sql','utf8');
 if(/methodology_version\s*,\s*is_demo[\s\S]*?true/i.test(text) && !/Temporary demo|demo market/i.test(text)){
   warnings.push('seed.sql contains demo data; ensure it remains clearly labeled and never rendered as real.');
@@ -62,4 +79,4 @@ if(errors.length){
   process.exit(1);
 }
 
-console.log(`Catalog QA passed: ${refs.length} references, ${[...variantKeys].length} variants.`);
+console.log(`Catalog QA passed: ${refs.length} references, ${[...variantKeys].length} variants, ${retail.length} verified retail prices.`);
