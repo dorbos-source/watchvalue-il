@@ -3,6 +3,7 @@ import pg from 'pg';
 import path from 'path';
 import fs from 'fs/promises';
 import { fileURLToPath } from 'url';
+import { syncCoreCatalogAndVariants } from './catalog/sync-core.js';
 
 const { Pool } = pg;
 const app = express();
@@ -17,7 +18,8 @@ async function initializeDatabase() {
   const seed = await fs.readFile(path.join(__dirname, 'seed.sql'), 'utf8');
   await pool.query(schema);
   await pool.query(seed);
-  console.log('WatchValue IL database initialized');
+  const syncReport = await syncCoreCatalogAndVariants(process.env.DATABASE_URL);
+  console.log('WatchValue IL database initialized', syncReport);
 }
 
 app.use(express.json());
