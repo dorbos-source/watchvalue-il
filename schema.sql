@@ -256,3 +256,26 @@ create table if not exists watchvalue_estimates (
   details jsonb not null default '{}'::jsonb
 );
 create index if not exists watchvalue_estimates_watch_time_idx on watchvalue_estimates(watch_id,as_of desc);
+
+
+-- Official manufacturer/store retail prices. Kept separate from secondary-market observations.
+create table if not exists retail_prices (
+  id bigserial primary key,
+  watch_id bigint not null references watches(id) on delete cascade,
+  variant_id bigint references watch_variants(id) on delete set null,
+  source_key text references source_registry(source_key) on delete set null,
+  source_url text,
+  price numeric(14,2) not null check(price>0),
+  currency text not null,
+  market_country text,
+  includes_tax boolean,
+  effective_at timestamptz not null default now(),
+  captured_at timestamptz not null default now(),
+  is_official boolean not null default false,
+  metadata jsonb not null default '{}'::jsonb
+);
+create index if not exists retail_prices_watch_time_idx on retail_prices(watch_id,effective_at desc);
+
+alter table watchvalue_estimates add column if not exists retail_price_ils numeric(14,2);
+alter table watchvalue_estimates add column if not exists market_to_retail_ratio numeric(10,4);
+alter table watchvalue_estimates add column if not exists premium_discount_pct numeric(10,2);
