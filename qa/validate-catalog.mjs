@@ -44,6 +44,8 @@ for(const [gi,group] of groups.entries()){
       }catch{ errors.push(`${ref}/${vk}: invalid source_url`); }
     }
     if(!v.source_type) errors.push(`${ref}/${vk}: missing source_type`);
+    if(v.source_type==='official' && v.source_key==='cartier_official' && v.source_url && !new URL(v.source_url).hostname.endsWith('cartier.com')) errors.push(`${ref}/${vk}: official source must use cartier.com`);
+    if(v.source_type==='official' && v.source_key==='rolex_official' && v.source_url && !new URL(v.source_url).hostname.endsWith('rolex.com')) errors.push(`${ref}/${vk}: official source must use rolex.com`);
     if(!v.source_key) errors.push(`${ref}/${vk}: missing source_key`);
     if(v.verified_at && Number.isNaN(Date.parse(v.verified_at))) errors.push(`${ref}/${vk}: invalid verified_at`);
   }
