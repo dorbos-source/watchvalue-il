@@ -238,11 +238,66 @@ async function processQueue(){
   }
   return {processed,ranQualityScan};
 }
+
+async function recoverStaleTasks(){
+  const {rowCount}=await pool.query(`
+    update agent_tasks
+    set status='queued',last_error='Recovered stale running task',updated_at=now(),run_after=now()
+    where status='running' and updated_at < now()-interval '2 hours' and attempts < 5
+  `);
+  return {recovered:rowCount};
+}
+
+async function sourceFreshnessHeartbeat(sourceKey,fn){
+  const started=new Date();
+  await pool.query(`
+    insert into source_refresh_state(source_key,last_attempt_at,consecutive_failures)
+    values($1,now(),0)
+    on conflict(source_key) do update set last_attempt_at=now()
+  `,[sourceKey]);
+  try{
+    const result=await fn();
+    await pool.query(`
+      update source_refresh_state set last_success_at=now(),consecutive_failures=0,last_error=null,
+        rows_seen=$2,rows_written=$3,next_refresh_at=now()+interval '6 hours'
+      where source_key=$1
+    `,[sourceKey,Number(result?.seen||0),Number(result?.written||0)]);
+    return result;
+  }catch(error){
+    await pool.query(`
+      update source_refresh_state set consecutive_failures=consecutive_failures+1,last_error=$2,
+        next_refresh_at=now()+interval '6 hours' where source_key=$1
+    `,[sourceKey,String(error?.message||error)]);
+    throw error;
+  }
+}
+
+async function enqueueAgentPipeline(){
+  const jobs=[
+    ['catalog_quality_scan',{scope:'phase1',brands:['Rolex','Cartier']}],
+    ['source_terms_review',{sources:['rolex_official','cartier_official','padani_cartier_il','chrono24_market','phillips_auction','boi_fx']}]
+  ];
+  let queued=0;
+  for(const [taskType,payload] of jobs){
+    const {rowCount}=await pool.query(`
+      insert into agent_tasks(task_type,payload,status,run_after)
+      select $1,$2::jsonb,'queued',now()
+      where not exists(
+        select 1 from agent_tasks where task_type=$1 and status in ('queued','running') and created_at>now()-interval '12 hours'
+      )
+    `,[taskType,JSON.stringify(payload)]);
+    queued+=rowCount;
+  }
+  return {queued};
+}
+
 async function main(){
   console.log('WatchValue worker starting');
+  await recoverStaleTasks();
+  await enqueueAgentPipeline();
   await syncCoreCatalog();
   await syncCoreVariants();
-  await syncVerifiedObservations();
+  await sourceFreshnessHeartbeat('phillips_auction',syncVerifiedObservations);
   await calculateWatchValueEstimates();
   const queue=await processQueue();
   if(!queue.ranQualityScan) await catalogQualityScan();
