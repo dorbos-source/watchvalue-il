@@ -13,8 +13,8 @@ async function logRun(jobType, fn) {
   try{
     const details=await fn();
     await pool.query(
-      "update ingestion_runs set status='success',finished_at=now(),details=$2::jsonb where id=$1",
-      [id,JSON.stringify(details||{})]
+      "update ingestion_runs set status='success',finished_at=now(),records_seen=$2,records_written=$3,details=$4::jsonb where id=$1",
+      [id,Number(details?.seen ?? details?.watches ?? details?.eligible ?? 0),Number(details?.written ?? details?.inserted ?? 0),JSON.stringify(details||{})]
     );
     return details;
   }catch(error){
