@@ -81,3 +81,7 @@ System should automatically ingest/update catalog data, collect permitted market
 - Rolex current collection baseline must be reconciled against the official Rolex model finder.
 - Cartier current collection baseline must be reconciled against Cartier's official all-watches catalog.
 - Secondary prices must preserve observation type (asking vs transaction vs auction result); never treat asks as completed sales.
+
+
+## Deployment sync
+- 2026-09-27: Triggered fresh Railway build after verifying both production services track GitHub `main`; latest FX, retail, freshness and premium UI work must be built from HEAD rather than snapshot redeploy.
