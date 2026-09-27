@@ -279,3 +279,23 @@ create index if not exists retail_prices_watch_time_idx on retail_prices(watch_i
 alter table watchvalue_estimates add column if not exists retail_price_ils numeric(14,2);
 alter table watchvalue_estimates add column if not exists market_to_retail_ratio numeric(10,4);
 alter table watchvalue_estimates add column if not exists premium_discount_pct numeric(10,2);
+
+
+-- FX provenance for historical and current ILS normalization.
+create table if not exists fx_rates (
+  id bigserial primary key,
+  rate_date date not null,
+  base_currency text not null,
+  quote_currency text not null default 'ILS',
+  rate numeric(18,8) not null check(rate>0),
+  source_key text not null,
+  source_url text,
+  captured_at timestamptz not null default now(),
+  metadata jsonb not null default '{}'::jsonb,
+  unique(rate_date,base_currency,quote_currency,source_key)
+);
+create index if not exists fx_rates_pair_date_idx on fx_rates(base_currency,quote_currency,rate_date desc);
+
+alter table market_observations add column if not exists fx_rate numeric(18,8);
+alter table market_observations add column if not exists fx_rate_date date;
+alter table market_observations add column if not exists fx_source_key text;
