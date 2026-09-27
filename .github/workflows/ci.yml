@@ -20,10 +20,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
 
       - name: JavaScript syntax
         run: |
@@ -31,6 +27,7 @@ jobs:
           node --check worker.js
           node --check app.js
           node --check catalog/import-catalog.js
+          node --check qa/validate-catalog.mjs
 
       - name: JSON parse
         run: |
@@ -39,4 +36,4 @@ jobs:
           node -e "JSON.parse(require('fs').readFileSync('market/verified-observations.json','utf8'))"
 
       - name: Catalog and provenance QA
-        run: npm run qa:catalog
+        run: node qa/validate-catalog.mjs
