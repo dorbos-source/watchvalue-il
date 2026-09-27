@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "qa:catalog": "node qa/validate-catalog.mjs"
   },
   "dependencies": {
     "express": "^4.21.2",
