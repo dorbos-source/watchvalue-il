@@ -686,5 +686,38 @@
     "bracelet": null,
     "bezel": null,
     "variant_key": "CB"
+  },
+  {
+    "brand": "Rolex",
+    "collection": "Submariner",
+    "model": "No Date",
+    "reference": "124060",
+    "status": "current",
+    "production_start": 2020,
+    "case_size_mm": 41,
+    "material": "Oystersteel",
+    "dial": "Black",
+    "official_model_name": "Submariner",
+    "nickname": "No Date",
+    "generation": "1240xx",
+    "bracelet": "Oyster",
+    "bezel": "Black Cerachrom",
+    "variant_key": "m124060-0001"
+  },
+  {
+    "brand": "Rolex",
+    "collection": "Datejust 41",
+    "model": "White Rolesor",
+    "reference": "126334",
+    "status": "current",
+    "case_size_mm": 41,
+    "material": "Oystersteel / White Gold",
+    "dial": "Various",
+    "official_model_name": "Datejust 41",
+    "nickname": null,
+    "generation": "1263xx",
+    "bracelet": "Oyster / Jubilee",
+    "bezel": "Fluted White Gold",
+    "variant_key": "126334"
   }
 ]
