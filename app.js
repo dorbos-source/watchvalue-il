@@ -66,12 +66,7 @@ async function loadDatabaseCatalog(){
   }
 }
 
-const brandMeta = [
- ['Rolex','The Crown'],['Patek Philippe','Geneva'],['Audemars Piguet','Le Brassus'],['Cartier','Paris'],
- ['Omega','Bienne'],['Richard Mille','Les Breuleux'],['Vacheron Constantin','Geneva'],['Tudor','Geneva'],
- ['IWC','Schaffhausen'],['Breitling','Grenchen'],['Panerai','Firenze'],['Jaeger-LeCoultre','Le Sentier'],
- ['Grand Seiko','Japan'],['Hublot','Nyon'],['A. Lange & Söhne','Glashütte'],['F.P. Journe','Geneva']
-];
+const brandMeta = [['Rolex','Geneva'],['Cartier','Paris']];
 
 const app = document.getElementById('app');
 const fmt = n => n ? new Intl.NumberFormat('he-IL',{style:'currency',currency:'ILS',maximumFractionDigits:0}).format(n) : '—';
@@ -101,7 +96,8 @@ function toast(msg){
 }
 
 function home(){
- const featured=watches[0];
+ const phaseOne=watches.filter(w=>['Rolex','Cartier'].includes(w.brand));
+ const featured=phaseOne.find(w=>w.brand==='Rolex')||phaseOne[0]||watches[0];
  app.innerHTML=`
  <section class="hero-v2">
    <div class="shell hero-layout">
@@ -125,7 +121,7 @@ function home(){
  </section>
 
  <section class="trust-strip"><div class="shell">
-   <div><b>16</b><span>מותגים נבחרים</span></div><i></i><div><b>Reference</b><span>תמחור ברמת דגם מדויק</span></div><i></i><div><b>Current + Discontinued</b><span>כולל דגמים שיצאו מייצור</span></div><i></i><div><b>Israel + Global</b><span>שכבת השוואה מקומית</span></div>
+   <div><b>2</b><span>מותגים בפוקוס: Rolex + Cartier</span></div><i></i><div><b>Reference</b><span>תמחור ברמת דגם מדויק</span></div><i></i><div><b>Current + Discontinued</b><span>כולל דגמים שיצאו מייצור</span></div><i></i><div><b>Israel + Global</b><span>שכבת השוואה מקומית</span></div>
  </div></section>
 
  ${marketBlock({limit:8,title:'השעונים החמים בשוק',subtitle:'דגמים עם עניין וסחירות גבוהים'})}
@@ -140,11 +136,11 @@ function home(){
 }
 
 function marketBlock({limit=null,title='מחירון השוק',subtitle='חפש והשווה לפי Reference'}={}){
- let data=filterWatches();
+ let data=filterWatches().filter(w=>['Rolex','Cartier'].includes(w.brand));
  if(limit) data=data.slice(0,limit);
  return `<section class="section-v2" id="market">
  <div class="shell">
-   <div class="section-head"><div><div class="micro-label">LIVE MARKET · DEMO DATA</div><h2>${title}</h2><p>${subtitle}</p></div><a class="text-link" href="#/market">לכל המחירון ←</a></div>
+   <div class="section-head"><div><div class="micro-label">ROLEX + CARTIER · PHASE 1</div><h2>${title}</h2><p>${subtitle}</p></div><a class="text-link" href="#/market">לכל המחירון ←</a></div>
    ${limit?'':filtersHtml()}
    <div class="market-shell">
      <div class="market-headrow"><span>שעון</span><span>מחיר שוק</span><span>Retail</span><span>12M</span><span>סחירות</span><span></span></div>
@@ -242,14 +238,14 @@ function refreshMarketOnly(){ const sec=document.querySelector('#market'); if(!s
 
 function brandBlock(){
  return `<section class="section-v2 muted-section" id="brands"><div class="shell">
-  <div class="section-head"><div><div class="micro-label">BRAND DIRECTORY</div><h2>המותגים שאנחנו עוקבים אחריהם</h2><p>רק שווקים עם סחירות, עניין ומספיק דאטה לתמחור.</p></div><a class="text-link" href="#/brands">לכל המותגים ←</a></div>
+  <div class="section-head"><div><div class="micro-label">BRAND DIRECTORY</div><h2>Phase 1 · Rolex + Cartier</h2><p>אנחנו מעמיקים קודם את שני המותגים עד רמת Reference ו־Variant לפני הרחבה למותגים נוספים.</p></div><a class="text-link" href="#/brands">לכל המותגים ←</a></div>
   <div class="brand-grid-v2">${brandMeta.map(([name,origin])=>`<button class="brand-card" data-brand="${name}"><span class="brand-monogram">${name.split(' ').map(x=>x[0]).join('').slice(0,2)}</span><div><b>${name}</b><small>${origin}</small></div><span class="brand-count">${watches.filter(w=>w.brand===name).length || 'Soon'}</span></button>`).join('')}</div>
  </div></section>`;
 }
 function brandsPage(){app.innerHTML=`<section class="page-hero"><div class="shell"><div class="micro-label">BRAND DIRECTORY</div><h1>מותגי היוקרה הסחירים</h1><p>הקטלוג יורחב לכל Reference סחיר בכל מותג.</p></div></section>${brandBlock()}`;bindCommon();}
 
 function discontinuedStrip(){
- const data=watches.filter(w=>w.status==='Discontinued').slice(0,4);
+ const data=watches.filter(w=>['Rolex','Cartier'].includes(w.brand)&&w.status==='Discontinued').slice(0,4);
  return `<section class="section-v2"><div class="shell"><div class="section-head"><div><div class="micro-label">DISCONTINUED</div><h2>דגמים שהשוק ממשיך לתמחר</h2><p>ייצור נגמר. השוק לא.</p></div><a class="text-link" href="#/discontinued">כל הדגמים ←</a></div><div class="cards-4">${data.map(w=>`<article class="watch-card" data-watch="${w.ref}"><div class="card-status">DISCONTINUED</div><div class="card-art"><span>${w.brand}</span><b>${w.ref}</b></div><h3>${w.collection}</h3><p>${w.model}</p><div class="card-bottom"><b>${fmt(w.market)}</b><span class="${w.change>=0?'positive':'negative'}">${w.change>=0?'+':''}${w.change}%</span></div></article>`).join('')}</div></div></section>`;
 }
 function discontinuedPage(){marketState={q:'',brand:'All',collection:'All',model:'All',year:'All',status:'Discontinued',material:'All',size:'All',sort:'popular'};app.innerHTML=`<section class="page-hero"><div class="shell"><div class="micro-label">DISCONTINUED INDEX</div><h1>הפסיקו לייצר. לא הפסיקו להיסחר.</h1><p>מעקב אחרי References שיצאו מייצור ועדיין פעילים בשוק המשני.</p></div></section>${marketBlock({title:'Discontinued Market',subtitle:'מחירי שוק לדגמים שהופסקו'})}`;bindMarket();}
@@ -260,7 +256,7 @@ function howItWorks(){
 function premiumBanner(){return `<section class="section-v2"><div class="shell"><div class="premium-banner"><div><div class="micro-label">WATCHVALUE PREMIUM</div><h2>לא רק המחיר של היום.</h2><p>גרפים, היסטוריה, התראות, Watchlist ומעקב תיק.</p></div><div><strong>$14.99</strong><span>/ חודש</span><button class="cta-button" data-pricing>7 ימים חינם</button></div></div></div></section>`; }
 
 function watchPage(ref){
- const w=watches.find(x=>x.ref.toLowerCase()===decodeURIComponent(ref).toLowerCase());
+ const w=watches.find(x=>['Rolex','Cartier'].includes(x.brand)&&x.ref.toLowerCase()===decodeURIComponent(ref).toLowerCase());
  if(!w){notFound();return;}
  const premium=w.retail?Math.round((w.market/w.retail-1)*100):null;
  app.innerHTML=`<section class="watch-page"><div class="shell">
@@ -283,7 +279,7 @@ function watchPage(ref){
       <div class="insight-card"><div><div class="micro-label">MARKET INSIGHT</div><h3>${premium!==null?`נסחר ${premium>=0?'מעל':'מתחת'} ל־Retail בכ־${Math.abs(premium)}%`:'Reference ללא Retail פעיל'}</h3><p>ב־Premium נציג כאן פער ישראל/עולם, מספר תצפיות, confidence score וזמן מכירה משוער.</p></div><button class="soft-button" data-pricing>פתח Premium</button></div>
     </div>
   </div>
-  <section class="related"><div class="section-head"><div><div class="micro-label">RELATED REFERENCES</div><h2>דגמים נוספים שכדאי להשוות</h2></div></div><div class="cards-4">${watches.filter(x=>x.brand===w.brand&&x.ref!==w.ref).slice(0,4).map(x=>`<article class="mini-watch-card" data-watch="${x.ref}"><span>${x.ref}</span><b>${x.collection}</b><small>${x.model}</small><strong>${fmt(x.market)}</strong></article>`).join('')||'<div class="empty-note">נוסיף References נוספים לקטלוג בקרוב.</div>'}</div></section>
+  <section class="related"><div class="section-head"><div><div class="micro-label">RELATED REFERENCES</div><h2>דגמים נוספים שכדאי להשוות</h2></div></div><div class="cards-4">${watches.filter(x=>['Rolex','Cartier'].includes(x.brand)&&x.brand===w.brand&&x.ref!==w.ref).slice(0,4).map(x=>`<article class="mini-watch-card" data-watch="${x.ref}"><span>${x.ref}</span><b>${x.collection}</b><small>${x.model}</small><strong>${fmt(x.market)}</strong></article>`).join('')||'<div class="empty-note">נוסיף References נוספים לקטלוג בקרוב.</div>'}</div></section>
  </div></section>`;
  bindCommon();
 }
