@@ -65,7 +65,7 @@
     "generation": "1266xx",
     "bracelet": "Oyster",
     "bezel": "Black Cerachrom",
-    "variant_key": "126610LN"
+    "variant_key": "m126610ln-0001"
   },
   {
     "brand": "Rolex",
@@ -111,13 +111,13 @@
     "production_start": 2023,
     "case_size_mm": 40,
     "material": "Oystersteel",
-    "dial": null,
+    "dial": "White / Black",
     "official_model_name": "Cosmograph Daytona",
     "nickname": null,
     "generation": "1265xx",
     "bracelet": "Oyster",
     "bezel": "Black Cerachrom",
-    "variant_key": null
+    "variant_key": "126500LN"
   },
   {
     "brand": "Rolex",
@@ -329,12 +329,12 @@
     "production_start": 2018,
     "case_size_mm": 39.8,
     "material": "Steel",
-    "dial": "White",
+    "dial": "Silvered opaline",
     "official_model_name": "Santos de Cartier",
     "nickname": null,
     "generation": null,
-    "bracelet": null,
-    "bezel": null,
+    "bracelet": "Steel + calfskin",
+    "bezel": "Steel",
     "variant_key": "WSSA0018"
   },
   {
@@ -345,12 +345,12 @@
     "status": "current",
     "case_size_mm": 35.1,
     "material": "Steel",
-    "dial": "White",
+    "dial": "Silvered opaline",
     "official_model_name": "Santos de Cartier",
     "nickname": null,
     "generation": null,
-    "bracelet": null,
-    "bezel": null,
+    "bracelet": "Steel + calfskin",
+    "bezel": "Steel",
     "variant_key": "WSSA0029"
   },
   {
@@ -366,8 +366,8 @@
     "official_model_name": "Tank Must",
     "nickname": null,
     "generation": null,
-    "bracelet": null,
-    "bezel": null,
+    "bracelet": "Steel",
+    "bezel": "Steel",
     "variant_key": "WSTA0041"
   },
   {
