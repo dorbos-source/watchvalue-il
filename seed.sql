@@ -35,41 +35,8 @@ on conflict(reference) do update set
 collection=excluded.collection,model=excluded.model,status=excluded.status,production_start=excluded.production_start,
 production_end=excluded.production_end,case_size_mm=excluded.case_size_mm,material=excluded.material,dial=excluded.dial,updated_at=now();
 
-with price_seed(reference,market_ils,retail_ils,change_12m,liquidity_score,liquidity_label) as (values
-('126710BLRO',72500,46500,4.8,94,'Very High'),
-('126610LN',55800,42300,2.1,98,'Very High'),
-('126500LN',109500,59100,6.2,96,'Very High'),
-('116610LV',74800,null,1.8,89,'High'),
-('126710BLNR',61200,45500,2.9,95,'Very High'),
-('228238',151000,167000,-0.7,78,'High'),
-('5711/1A-010',395000,null,-1.6,82,'High'),
-('5712/1A-001',462000,null,3.1,76,'High'),
-('15510ST.OO.1320ST.06',186000,117000,0.9,84,'High'),
-('16202ST.OO.1240ST.02',348000,null,2.4,71,'High'),
-('WSSA0018',23500,31500,3.4,88,'High'),
-('WSTA0041',11800,13900,1.3,83,'High'),
-('310.30.42.50.01.002',24800,33300,1.2,91,'High'),
-('210.30.42.20.01.001',16800,23500,-0.5,87,'High'),
-('RM11-03',785000,null,-2.4,53,'Medium'),
-('4500V/110A-B128',103000,null,2.7,72,'High'),
-('79030N',10500,14900,0.5,86,'High'),
-('IW328201',18100,25200,-1.1,67,'Medium'),
-('AB0138211B1P1',22300,35200,-0.8,63,'Medium'),
-('CB',315000,null,5.4,48,'Medium')
-)
-insert into price_snapshots(
-  watch_id,as_of,currency,market_value_ils,retail_price_ils,dealer_buy_ils,dealer_ask_ils,private_sale_ils,
-  change_12m,liquidity_score,liquidity_label,confidence,listing_count,source_count,methodology_version,is_demo
-)
-select w.id,'2026-09-24T00:00:00Z','ILS',p.market_ils,p.retail_ils,
-round(p.market_ils*0.91),round(p.market_ils*1.055),round(p.market_ils*0.96),
-p.change_12m,p.liquidity_score,p.liquidity_label,65,0,0,'demo-v1',true
-from price_seed p join watches w on w.reference=p.reference
-on conflict(watch_id,as_of) do update set
-market_value_ils=excluded.market_value_ils,retail_price_ils=excluded.retail_price_ils,
-dealer_buy_ils=excluded.dealer_buy_ils,dealer_ask_ils=excluded.dealer_ask_ils,private_sale_ils=excluded.private_sale_ils,
-change_12m=excluded.change_12m,liquidity_score=excluded.liquidity_score,liquidity_label=excluded.liquidity_label,
-confidence=excluded.confidence,methodology_version=excluded.methodology_version,is_demo=excluded.is_demo;
+-- Production cleanup: synthetic/demo price snapshots must never survive startup.
+delete from price_snapshots where is_demo=true;
 
 insert into project_memory(key,value) values
 ('product', '{"name":"WatchValue IL","market":"Israel","positioning":"Luxury watch price guide and market intelligence"}'),
@@ -85,10 +52,10 @@ insert into source_registry(source_key,name,source_type,base_url,enabled,usage_m
 ('ap_official','Audemars Piguet Official','official','https://www.audemarspiguet.com',false,'metadata','Official catalog/reference metadata only; enable adapter after source terms are reviewed.'),
 ('cartier_official','Cartier Official','official','https://www.cartier.com',false,'metadata','Official catalog/reference metadata only; enable adapter after source terms are reviewed.'),
 ('omega_official','Omega Official','official','https://www.omegawatches.com',false,'metadata','Official catalog/reference metadata only; enable adapter after source terms are reviewed.'),
-('manual_market_seed','WatchValue Curated Market Seed','marketplace',null,true,'demo','Temporary demo market observations only. Replace with permitted live data adapters.'),
+('manual_market_seed','WatchValue Curated Market Seed','marketplace',null,false,'disabled_demo','Legacy demo source retained only for provenance; no demo observations may be presented or ingested.'),
 ('padani_cartier_il','Padani Cartier Israel','dealer','https://padani.com/collections/cartier',false,'retail','Israeli Cartier retail/catalog source. Current public catalog exposes ILS pricing; enable automated adapter only after usage/terms review.'),
 ('chrono24_market','Chrono24','marketplace','https://www.chrono24.com',false,'asking','Secondary-market asking/listing depth. Keep asking prices separate from completed transactions; enable automated adapter only after usage/terms review.'),
-('phillips_auctions','Phillips Auctions','auction','https://www.phillips.com',true,'transaction','Public completed auction-result observations; retain source URL and sale date.'),
+('phillips_auction','Phillips Auctions','auction','https://www.phillips.com',true,'public_results','Public completed auction-result observations; retain source URL and sale date.'),
 ('boi_fx','Bank of Israel FX','fx','https://www.boi.org.il',false,'fx','Official ILS FX normalization source; historical rate provenance required before conversion.')
 on conflict(source_key) do update set name=excluded.name,source_type=excluded.source_type,base_url=excluded.base_url,
 enabled=excluded.enabled,usage_mode=excluded.usage_mode,notes=excluded.notes,updated_at=now();
