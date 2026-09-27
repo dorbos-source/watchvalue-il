@@ -9,7 +9,8 @@
         "bezel": "Black Cerachrom tachymetric",
         "material": "Oystersteel",
         "source_url": "https://www.rolex.com/en-us/watches/cosmograph-daytona/m126500ln-0001",
-        "source_type": "official"
+        "source_type": "official",
+        "source_key": "rolex_official"
       },
       {
         "variant_key": "m126500ln-0002",
@@ -18,7 +19,8 @@
         "bezel": "Black Cerachrom tachymetric",
         "material": "Oystersteel",
         "source_url": "https://www.rolex.com/he/watches/cosmograph-daytona/m126500ln-0002",
-        "source_type": "official"
+        "source_type": "official",
+        "source_key": "rolex_official"
       }
     ]
   },
@@ -32,7 +34,8 @@
         "bezel": "Blue / Black Cerachrom",
         "material": "Oystersteel",
         "source_url": "https://www.rolex.com/watches/gmt-master-ii/m126710blnr-0002",
-        "source_type": "official"
+        "source_type": "official",
+        "source_key": "rolex_official"
       },
       {
         "variant_key": "m126710blnr-0003",
@@ -41,7 +44,68 @@
         "bezel": "Blue / Black Cerachrom",
         "material": "Oystersteel",
         "source_url": "https://www.rolex.com/en-us/watches/gmt-master-ii/m126710blnr-0003",
-        "source_type": "official"
+        "source_type": "official",
+        "source_key": "rolex_official"
+      }
+    ]
+  },
+  {
+    "reference": "126610LN",
+    "variants": [
+      {
+        "variant_key": "m126610ln-0001",
+        "dial": "Black",
+        "bracelet": "Oyster",
+        "bezel": "Black Cerachrom",
+        "material": "Oystersteel",
+        "source_url": "https://www.rolex.com/en-us/watches/submariner/m126610ln-0001",
+        "source_type": "official",
+        "source_key": "rolex_official"
+      }
+    ]
+  },
+  {
+    "reference": "WSSA0018",
+    "variants": [
+      {
+        "variant_key": "WSSA0018",
+        "dial": "Silvered opaline",
+        "bracelet": "Steel + calfskin interchangeable",
+        "bezel": "Steel",
+        "material": "Steel",
+        "source_url": "https://int.cartier.com/en/collections/watches/choose-your-watch/by-material/steel-watches/wssa0018-santos-de-cartier-watch.html",
+        "source_type": "official",
+        "source_key": "cartier_official"
+      }
+    ]
+  },
+  {
+    "reference": "WSSA0029",
+    "variants": [
+      {
+        "variant_key": "WSSA0029",
+        "dial": "Silvered opaline",
+        "bracelet": "Steel + calfskin interchangeable",
+        "bezel": "Steel",
+        "material": "Steel",
+        "source_url": "https://int.cartier.com/en/collections/watches/choose-your-watch/by-bracelet-or-straps/leather-straps/duo-metal-%26-leather/wssa0029-santos-de-cartier-watch.html",
+        "source_type": "official",
+        "source_key": "cartier_official"
+      }
+    ]
+  },
+  {
+    "reference": "WSTA0041",
+    "variants": [
+      {
+        "variant_key": "WSTA0041",
+        "dial": "White",
+        "bracelet": "Steel",
+        "bezel": "Steel",
+        "material": "Steel",
+        "source_url": "https://www.userguide.cartier.com/WSTA0041.html",
+        "source_type": "official",
+        "source_key": "cartier_official"
       }
     ]
   }
