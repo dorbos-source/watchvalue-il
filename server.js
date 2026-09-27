@@ -106,10 +106,11 @@ app.get('/api/watch/:reference/market', async (req,res)=>{
   if(!pool) return res.status(503).json({error:'Database unavailable'});
   const {rows:[watch]}=await pool.query('select id from watches where lower(reference)=lower($1) limit 1',[req.params.reference]);
   if(!watch) return res.status(404).json({error:'Reference not found'});
-  const [observations,estimate]=await Promise.all([
+  const [observations,estimate,retail,variants,freshness]=await Promise.all([
     pool.query(`
       select mo.observation_type,mo.price,mo.currency,mo.price_ils,mo.condition,mo.year,mo.full_set,
-             mo.country,mo.seller_type,mo.observed_at,mo.is_verified,s.name as source_name
+             mo.country,mo.seller_type,mo.observed_at,mo.captured_at,mo.is_verified,mo.source_key,mo.source_url,
+             mo.fx_rate,mo.fx_rate_date,mo.fx_source_key,s.name as source_name
       from market_observations mo left join source_registry s on s.source_key=mo.source_key
       where mo.watch_id=$1 order by mo.observed_at desc limit 100
     `,[watch.id]),
@@ -117,9 +118,40 @@ app.get('/api/watch/:reference/market', async (req,res)=>{
       select market_value_ils,low_ils,high_ils,confidence,observation_count,source_count,
              methodology_version,is_demo,as_of
       from watchvalue_estimates where watch_id=$1 order by as_of desc limit 1
+    `,[watch.id]),
+    pool.query(`
+      select rp.price,rp.currency,rp.market_country,rp.includes_tax,rp.effective_at,rp.captured_at,
+             rp.is_official,rp.source_key,rp.source_url,s.name as source_name
+      from retail_prices rp left join source_registry s on s.source_key=rp.source_key
+      where rp.watch_id=$1 order by rp.effective_at desc,rp.captured_at desc limit 30
+    `,[watch.id]),
+    pool.query(`
+      select v.variant_key,v.nickname,v.dial,v.bracelet,v.bezel,v.material,v.image_url,
+             c.source_key,c.source_url,c.verified_at,c.confidence
+      from watch_variants v
+      left join catalog_fact_sources c on c.variant_id=v.id and c.field_name='variant_configuration'
+      where v.watch_id=$1 order by v.variant_key
+    `,[watch.id]),
+    pool.query(`
+      select sr.source_key,sr.name,sr.source_type,sr.usage_mode,sr.enabled,
+             sf.last_attempt_at,sf.last_success_at,sf.next_refresh_at,sf.consecutive_failures,
+             sf.last_error,sf.rows_seen,sf.rows_written
+      from source_registry sr left join source_refresh_state sf on sf.source_key=sr.source_key
+      where sr.source_key in (
+        select distinct source_key from market_observations where watch_id=$1
+        union select distinct source_key from retail_prices where watch_id=$1
+        union select distinct c.source_key from catalog_fact_sources c where c.watch_id=$1
+      ) order by sr.name
     `,[watch.id])
   ]);
-  res.json({estimate:estimate.rows[0]||null,observations:observations.rows});
+  res.json({
+    estimate:estimate.rows[0]||null,
+    observations:observations.rows,
+    retail:retail.rows,
+    variants:variants.rows,
+    sources:freshness.rows,
+    provenance:{generatedAt:new Date().toISOString(),reference:req.params.reference}
+  });
 });
 
 app.get('/api/project-memory', async (_req, res) => {
