@@ -124,7 +124,7 @@ async function syncCoreVariants(){
           `,[variant.id,row.source_url]);
           await client.query(`
             insert into catalog_fact_sources(watch_id,variant_id,field_name,source_key,source_url,source_type,verified_at,confidence,notes)
-            values($1,$2,'variant_configuration','official_catalog',$3,$4,now(),100,'Verified against official manufacturer page')
+            values($1,$2,'variant_configuration',$5,$3,$4,now(),100,'Verified against official manufacturer page')
           `,[watch.id,variant.id,row.source_url,row.source_type||'official']);
           written++;
         }
@@ -171,10 +171,10 @@ async function syncVerifiedObservations(){
 
 async function calculateWatchValueEstimates(){
   return logRun('watchvalue_estimate',async()=>{
-    const {rows:watches}=await pool.query("select distinct watch_id from market_observations where is_verified=true and price_ils>0");
+    const {rows:watches}=await pool.query("select distinct watch_id from market_observations where is_verified=true and price_ils>0 and (currency='ILS' or (fx_rate is not null and fx_source_key is not null))");
     let written=0,skipped=0;
     for(const item of watches){
-      const {rows}=await pool.query("select price_ils,source_key from market_observations where watch_id=$1 and is_verified=true and price_ils>0 order by price_ils",[item.watch_id]);
+      const {rows}=await pool.query("select price_ils,source_key from market_observations where watch_id=$1 and is_verified=true and price_ils>0 and (currency='ILS' or (fx_rate is not null and fx_source_key is not null)) order by price_ils",[item.watch_id]);
       const sources=new Set(rows.map(x=>x.source_key).filter(Boolean)).size;
       if(rows.length<3 || sources<2){skipped++;continue;}
       const v=rows.map(x=>Number(x.price_ils)).sort((a,b)=>a-b);
