@@ -88,3 +88,5 @@ System should automatically ingest/update catalog data, collect permitted market
 
 ## Provenance QA rule — 2026-09-27
 - Official catalog variants must use manufacturer-owned source URLs. Rolex official rows must resolve to rolex.com and Cartier official rows to cartier.com. Reject mismatched hosts during catalog QA before deployment.
+
+- 2026-09-28: Cartier official-source verification pass completed for W4TA0031, WSSA0082, W2SA0033, W2SA0038, W2SA0034, W4TA0028, W4TA0029, and W4TA0030. Data-file writes were blocked by connector safety checks; do not treat these eight as imported until catalog commits land.
