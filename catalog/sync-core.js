@@ -74,8 +74,15 @@ export async function syncCoreCatalogAndVariants(connectionString=process.env.DA
         variantsWritten++;
       }
     }
+    const legacyOrphans=['126500LN-BLK'];
+    for(const reference of legacyOrphans){
+      if(!refs.some(row=>String(row.reference).toLowerCase()===reference.toLowerCase())){
+        await client.query('delete from watches where lower(reference)=lower($1)',[reference]);
+      }
+    }
+
     await client.query('commit');
-    return {references:{seen:refs.length,written:refsWritten},variants:{groups:groups.length,written:variantsWritten}};
+    return {references:{seen:refs.length,written:refsWritten},variants:{groups:groups.length,written:variantsWritten},legacyOrphansRemoved:legacyOrphans};
   }catch(error){
     await client.query('rollback');
     throw error;
