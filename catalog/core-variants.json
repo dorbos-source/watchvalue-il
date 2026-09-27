@@ -216,5 +216,52 @@
         "verified_at": "2026-09-27T12:41:10.350Z"
       }
     ]
+  },
+  {
+    "reference": "WSTA0106",
+    "variants": [
+      {
+        "variant_key": "WSTA0106",
+        "dial": "Silvered",
+        "bracelet": "Steel",
+        "bezel": "Steel",
+        "material": "Steel",
+        "source_url": "https://int.cartier.com/en/collections/watches/all-watches/tank-watches/wsta0106-tank-must-de-cartier-watch.html",
+        "source_type": "official",
+        "source_key": "cartier_official",
+        "verified_at": "2026-09-27T12:42:32.240Z"
+      }
+    ]
+  },
+  {
+    "reference": "WSTA0107",
+    "variants": [
+      {
+        "variant_key": "WSTA0107",
+        "bracelet": "Steel / leather variants",
+        "bezel": "Steel",
+        "material": "Steel",
+        "source_url": "https://int.cartier.com/en/collections/watches/all-watches/tank-watches/wsta0107-tank-must-de-cartier-horloge.html",
+        "source_type": "official",
+        "source_key": "cartier_official",
+        "verified_at": "2026-09-27T12:42:32.240Z"
+      }
+    ]
+  },
+  {
+    "reference": "W2SA0037",
+    "variants": [
+      {
+        "variant_key": "W2SA0037",
+        "dial": "Silvered satin-brushed with sunray effect",
+        "bracelet": "Black alligator leather",
+        "bezel": "18K rose gold",
+        "material": "Steel / Rose Gold",
+        "source_url": "https://int.cartier.com/en/collections/watches/choose-your-watch/by-bracelet-or-straps/leather-straps/interchangeable-leather/w2sa0037-santos-dumont-watch.html",
+        "source_type": "official",
+        "source_key": "cartier_official",
+        "verified_at": "2026-09-27T12:42:32.240Z"
+      }
+    ]
   }
 ]
