@@ -19,3 +19,5 @@ All market prices in this MVP are placeholders for product/design testing only. 
 
 
 <!-- railway-sync: 2026-09-26T17:25Z -->
+
+<!-- hourly-build: 2026-09-27 verified catalog research pass -->
