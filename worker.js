@@ -150,7 +150,9 @@ async function syncVerifiedObservations(){
       ('poundsterlinglive_historical','Pound Sterling Live Historical FX','fx','https://www.poundsterlinglive.com',true,'historical_fx',
        'Historical CHF/ILS series provenance used only with explicit rate date.',now()),
       ('valutafx_historical','ValutaFX Historical FX','fx','https://www.valutafx.com',true,'historical_fx',
-       'Historical CHF/ILS series provenance used only with explicit rate date.',now())
+       'Historical CHF/ILS series provenance used only with explicit rate date.',now()),
+      ('exchange_rates_org_historical','Exchange-Rates.org Historical FX','fx','https://www.exchange-rates.org',true,'historical_fx',
+       'Historical USD/ILS series provenance used only with explicit rate date.',now())
       on conflict(source_key) do update set name=excluded.name,source_type=excluded.source_type,
         base_url=excluded.base_url,enabled=excluded.enabled,usage_mode=excluded.usage_mode,
         notes=excluded.notes,last_checked_at=now()
@@ -239,12 +241,15 @@ async function calculateWatchValueEstimates(){
       const median=v.length%2?v[(v.length-1)/2]:(v[v.length/2-1]+v[v.length/2])/2;
       const d=v.map(x=>Math.abs(x-median)).sort((a,b)=>a-b);
       const mad=d.length%2?d[(d.length-1)/2]:(d[d.length/2-1]+d[d.length/2])/2;
-      const clean=mad===0?v:v.filter(x=>Math.abs(x-median)<=3*mad);
+      const cleanRows=mad===0?rows:rows.filter(x=>Math.abs(Number(x.price_ils)-median)<=3*mad);
+      const clean=cleanRows.map(x=>Number(x.price_ils)).sort((a,b)=>a-b);
+      const cleanSources=new Set(cleanRows.map(x=>x.source_key).filter(Boolean)).size;
+      if(clean.length<3 || cleanSources<2){skipped++;continue;}
       const value=clean.length%2?clean[(clean.length-1)/2]:(clean[clean.length/2-1]+clean[clean.length/2])/2;
       const low=clean[Math.floor((clean.length-1)*0.25)];
       const high=clean[Math.floor((clean.length-1)*0.75)];
-      const confidence=Math.min(95,35+Math.min(clean.length,20)*2+Math.min(sources,5)*8);
-      await pool.query("insert into watchvalue_estimates(watch_id,market_value_ils,low_ils,high_ils,confidence,observation_count,source_count,methodology_version,is_demo,details) values($1,$2,$3,$4,$5,$6,$7,'wv-median-mad-v1',false,$8::jsonb)",[item.watch_id,Math.round(value),Math.round(low),Math.round(high),confidence,clean.length,sources,JSON.stringify({verifiedOnly:true,outlierRule:'3x MAD',minimumObservations:3,minimumSources:2})]);
+      const confidence=Math.min(95,35+Math.min(clean.length,20)*2+Math.min(cleanSources,5)*8);
+      await pool.query("insert into watchvalue_estimates(watch_id,market_value_ils,low_ils,high_ils,confidence,observation_count,source_count,methodology_version,is_demo,details) values($1,$2,$3,$4,$5,$6,$7,'wv-median-mad-v1',false,$8::jsonb)",[item.watch_id,Math.round(value),Math.round(low),Math.round(high),confidence,clean.length,cleanSources,JSON.stringify({verifiedOnly:true,outlierRule:'3x MAD',minimumObservations:3,minimumSources:2,thresholdAppliedAfterOutlierFiltering:true})]);
       written++;
     }
     return {eligible:watches.length,written,skipped};
