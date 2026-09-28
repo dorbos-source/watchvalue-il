@@ -11,6 +11,20 @@ const retail=JSON.parse(fs.readFileSync(retailPath,'utf8'));
 const errors=[];
 const warnings=[];
 
+const marketRules=JSON.parse(fs.readFileSync('market/variant-rules.json','utf8'));
+const marketRuleVariantKeys=new Set();
+for(const family of marketRules.rolex_gmt_master_ii||[]){
+  for(const v of family.variants||[]){
+    if(!family.reference || !v.variant_key || !v.bracelet || !v.official_url){
+      errors.push('market/variant-rules.json has incomplete identity rule');
+      continue;
+    }
+    if(marketRuleVariantKeys.has(v.variant_key)) errors.push(`Duplicate market identity variant_key: ${v.variant_key}`);
+    marketRuleVariantKeys.add(v.variant_key);
+  }
+}
+
+
 const refKeys=new Set();
 for(const [i,row] of refs.entries()){
   const ref=String(row.reference||'').trim();
