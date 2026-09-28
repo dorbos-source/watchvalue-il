@@ -152,6 +152,8 @@ async function syncVerifiedObservations(){
       ('valutafx_historical','ValutaFX Historical FX','fx','https://www.valutafx.com',true,'historical_fx',
        'Historical CHF/ILS series provenance used only with explicit rate date.',now()),
       ('exchange_rates_org_historical','Exchange-Rates.org Historical FX','fx','https://www.exchange-rates.org',true,'historical_fx',
+       'Historical FX series provenance used only with explicit rate date.',now()),
+      ('exchange_rates_uk_historical','Exchange Rates UK Historical FX','fx','https://www.exchangerates.org.uk',true,'historical_fx',
        'Historical USD/ILS series provenance used only with explicit rate date.',now())
       on conflict(source_key) do update set name=excluded.name,source_type=excluded.source_type,
         base_url=excluded.base_url,enabled=excluded.enabled,usage_mode=excluded.usage_mode,
