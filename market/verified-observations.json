@@ -142,5 +142,25 @@
     "country": "CH",
     "observed_at": "2025-11-19T12:00:00Z",
     "is_verified": true
+  },
+  {
+    "reference": "126710BLRO",
+    "source_key": "christies_auction",
+    "source_observation_id": "christies-6590231",
+    "source_url": "https://www.christies.com/en/lot/lot-6590231",
+    "observation_type": "auction_result",
+    "price": 25400,
+    "currency": "USD",
+    "price_ils": 74191.88,
+    "fx_rate": 2.92094,
+    "fx_rate_date": "2026-06-12",
+    "fx_source_key": "exchange_rates_org_historical",
+    "fx_source_url": "https://www.exchange-rates.org/exchange-rate-history/usd-ils-2026-06-12",
+    "condition": "pre-owned",
+    "year": 2023,
+    "full_set": true,
+    "country": "US",
+    "observed_at": "2026-06-12T12:00:00Z",
+    "is_verified": true
   }
 ]
