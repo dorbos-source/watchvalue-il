@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "matching_policy": {
+    "required": [
+      "reference",
+      "variant_key",
+      "year",
+      "bracelet"
+    ],
+    "reject_if_missing": [
+      "year",
+      "variant_key"
+    ],
+    "notes": [
+      "Never aggregate prices across different bezel/color variants.",
+      "Never aggregate Oyster and Jubilee prices when both exist for the reference.",
+      "Condition and full-set status are retained as separate dimensions; do not silently normalize them."
+    ]
+  },
+  "rolex_gmt_master_ii": [
+    {
+      "reference": "126710BLRO",
+      "nickname": "Pepsi",
+      "bezel": "Red / Blue Cerachrom",
+      "variants": [
+        {
+          "variant_key": "m126710blro-0001",
+          "bracelet": "Jubilee",
+          "official_url": "https://assets.rolex.com/api/brochure/en-us/gmt-master-ii/m126710blro-0001.pdf"
+        }
+      ]
+    },
+    {
+      "reference": "126710BLNR",
+      "nickname": "Batman / Batgirl",
+      "bezel": "Blue / Black Cerachrom",
+      "variants": [
+        {
+          "variant_key": "m126710blnr-0002",
+          "bracelet": "Jubilee",
+          "market_label": "Batgirl",
+          "official_url": "https://www.rolex.com/en-us/watches/gmt-master-ii/m126710blnr-0002"
+        },
+        {
+          "variant_key": "m126710blnr-0003",
+          "bracelet": "Oyster",
+          "market_label": "Batman",
+          "official_url": "https://www.rolex.com/en-us/watches/gmt-master-ii/m126710blnr-0003"
+        }
+      ]
+    },
+    {
+      "reference": "126720VTNR",
+      "nickname": "Sprite",
+      "bezel": "Green / Black Cerachrom",
+      "variants": [
+        {
+          "variant_key": "m126720vtnr-0001",
+          "bracelet": "Oyster",
+          "official_url": "https://www.rolex.com/watches/gmt-master-ii/m126720vtnr-0001"
+        },
+        {
+          "variant_key": "m126720vtnr-0002",
+          "bracelet": "Jubilee",
+          "official_url": "https://www.rolex.com/en-us/watches/gmt-master-ii/m126720vtnr-0002"
+        }
+      ]
+    }
+  ]
+}
