@@ -3,10 +3,13 @@ import pg from 'pg';
 import path from 'path';
 import fs from 'fs/promises';
 import { fileURLToPath } from 'url';
+import { execFile } from 'child_process';
+import { promisify } from 'util';
 import { syncCoreCatalogAndVariants } from './catalog/sync-core.js';
 
 const { Pool } = pg;
 const app = express();
+const execFileAsync = promisify(execFile);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const port = process.env.PORT || 3000;
@@ -20,6 +23,19 @@ async function initializeDatabase() {
   await pool.query(seed);
   const syncReport = await syncCoreCatalogAndVariants(process.env.DATABASE_URL);
   console.log('WatchValue IL database initialized', syncReport);
+  try {
+    const { stdout, stderr } = await execFileAsync(process.execPath, ['worker.js'], {
+      cwd: __dirname,
+      env: process.env,
+      timeout: 120000,
+      maxBuffer: 1024 * 1024
+    });
+    if (stdout?.trim()) console.log('WatchValue startup worker:', stdout.trim());
+    if (stderr?.trim()) console.warn('WatchValue startup worker stderr:', stderr.trim());
+  } catch (error) {
+    console.error('WatchValue startup worker failed:', error?.stderr || error?.stack || error);
+    throw error;
+  }
 }
 
 app.use(express.json());
