@@ -262,5 +262,32 @@
     "country": "CH",
     "observed_at": "2019-08-27T12:00:00Z",
     "is_verified": true
+  },
+  {
+    "reference": "126610LV",
+    "source_key": "phillips_auction",
+    "source_observation_id": "phillips-204152",
+    "source_url": "https://www.phillips.com/detail/rolex/204152",
+    "observation_type": "auction_result",
+    "price": 114300,
+    "currency": "HKD",
+    "price_ils": 54384.59,
+    "fx_rate": 0.47580573,
+    "fx_rate_date": "2024-09-27",
+    "fx_source_key": "derived_crossrate_historical",
+    "fx_source_url": "https://www.exchangerates.org.uk/USD-ILS-spot-exchange-rates-history-2024.html",
+    "fx_components": {
+      "USD/ILS": 3.6982,
+      "USD/HKD": 7.7725,
+      "USD/ILS_source": "https://www.exchangerates.org.uk/USD-ILS-spot-exchange-rates-history-2024.html",
+      "USD/HKD_source": "https://www.federalreserve.gov/releases/h10/hist/dat00_hk.htm",
+      "formula": "HKD/ILS = USD/ILS ÷ USD/HKD"
+    },
+    "condition": "like new",
+    "year": 2020,
+    "full_set": true,
+    "country": "HK",
+    "observed_at": "2024-09-27T12:00:00Z",
+    "is_verified": true
   }
 ]

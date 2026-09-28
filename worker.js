@@ -154,7 +154,9 @@ async function syncVerifiedObservations(){
       ('exchange_rates_org_historical','Exchange-Rates.org Historical FX','fx','https://www.exchange-rates.org',true,'historical_fx',
        'Historical FX series provenance used only with explicit rate date.',now()),
       ('exchange_rates_uk_historical','Exchange Rates UK Historical FX','fx','https://www.exchangerates.org.uk',true,'historical_fx',
-       'Historical USD/ILS series provenance used only with explicit rate date.',now())
+       'Historical USD/ILS series provenance used only with explicit rate date.',now()),
+      ('derived_crossrate_historical','Derived Historical Cross-Rate','fx','https://www.exchangerates.org.uk',true,'historical_fx',
+       'Cross-rate derived from two dated public FX series; components are preserved in observation metadata.',now())
       on conflict(source_key) do update set name=excluded.name,source_type=excluded.source_type,
         base_url=excluded.base_url,enabled=excluded.enabled,usage_mode=excluded.usage_mode,
         notes=excluded.notes,last_checked_at=now()
@@ -177,7 +179,7 @@ async function syncVerifiedObservations(){
           fx_rate_date=excluded.fx_rate_date,fx_source_key=excluded.fx_source_key,captured_at=now()
       `,[watch.id,row.source_key,row.source_observation_id,row.source_url,row.observation_type,row.price,row.currency,
           row.price_ils||null,row.condition||null,row.year||null,row.full_set??null,row.country||null,row.observed_at,
-          !!row.is_verified,JSON.stringify({import:'verified-public-seed',fx_source_url:row.fx_source_url||null}),
+          !!row.is_verified,JSON.stringify({import:'verified-public-seed',fx_source_url:row.fx_source_url||null,fx_components:row.fx_components||null}),
           row.fx_rate||null,row.fx_rate_date||null,row.fx_source_key||null]);
       written++;
     }
