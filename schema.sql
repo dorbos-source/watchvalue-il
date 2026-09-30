@@ -320,3 +320,49 @@ alter table watchvalue_estimates add column if not exists newest_observation_at 
 alter table watchvalue_estimates add column if not exists oldest_observation_at timestamptz;
 
 create index if not exists market_observations_captured_idx on market_observations(captured_at desc);
+
+
+-- Marketplace asking-price observations used by the simplified pricing pipeline.
+create table if not exists marketplace_listings (
+  id bigserial primary key,
+  watch_id bigint not null references watches(id) on delete cascade,
+  variant_id bigint references watch_variants(id) on delete set null,
+  source_key text references source_registry(source_key) on delete set null,
+  source_listing_id text,
+  source_url text not null,
+  title text,
+  asking_price numeric(14,2) not null check(asking_price>0),
+  currency text not null,
+  price_ils numeric(14,2),
+  year int not null,
+  bracelet text not null,
+  condition text,
+  full_set boolean,
+  country text,
+  seller_type text,
+  captured_at timestamptz not null default now(),
+  is_active boolean not null default true,
+  metadata jsonb not null default '{}'::jsonb
+);
+create unique index if not exists marketplace_listings_source_id_uidx
+  on marketplace_listings(source_key,source_listing_id)
+  where source_listing_id is not null;
+create index if not exists marketplace_listings_watch_variant_year_idx
+  on marketplace_listings(watch_id,variant_id,year,captured_at desc);
+
+create table if not exists yearly_market_prices (
+  id bigserial primary key,
+  watch_id bigint not null references watches(id) on delete cascade,
+  variant_id bigint not null references watch_variants(id) on delete cascade,
+  year int not null,
+  as_of timestamptz not null default now(),
+  market_price_ils numeric(14,2) not null,
+  low_ils numeric(14,2),
+  high_ils numeric(14,2),
+  listing_count int not null default 0,
+  source_count int not null default 0,
+  methodology_version text not null default 'marketplace-median-v1',
+  details jsonb not null default '{}'::jsonb
+);
+create index if not exists yearly_market_prices_lookup_idx
+  on yearly_market_prices(watch_id,variant_id,year,as_of desc);
