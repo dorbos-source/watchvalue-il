@@ -120,6 +120,23 @@ app.get('/api/watch/:reference', async (req,res)=>{
   res.json(rows[0]);
 });
 
+app.get('/api/watch/:reference/yearly-prices', async (req,res)=>{
+  if(!pool) return res.status(503).json({error:'Database unavailable'});
+  const {rows:[watch]}=await pool.query('select id from watches where lower(reference)=lower($1) limit 1',[req.params.reference]);
+  if(!watch) return res.status(404).json({error:'Reference not found'});
+  const {rows}=await pool.query(`
+    select ymp.year,ymp.market_price_ils,ymp.low_ils,ymp.high_ils,ymp.listing_count,ymp.source_count,
+           ymp.methodology_version,ymp.as_of,v.variant_key,v.bracelet,v.dial,v.bezel,
+           ymp.details
+    from yearly_market_prices ymp
+    join watch_variants v on v.id=ymp.variant_id
+    where ymp.watch_id=$1
+      and ymp.as_of=(select max(y2.as_of) from yearly_market_prices y2 where y2.watch_id=ymp.watch_id and y2.variant_id=ymp.variant_id and y2.year=ymp.year)
+    order by ymp.year desc,v.variant_key
+  `,[watch.id]);
+  res.json(rows);
+});
+
 app.get('/api/watch/:reference/market', async (req,res)=>{
   if(!pool) return res.status(503).json({error:'Database unavailable'});
   const {rows:[watch]}=await pool.query('select id from watches where lower(reference)=lower($1) limit 1',[req.params.reference]);
