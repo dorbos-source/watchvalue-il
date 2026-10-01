@@ -366,3 +366,23 @@ create table if not exists yearly_market_prices (
 );
 create index if not exists yearly_market_prices_lookup_idx
   on yearly_market_prices(watch_id,variant_id,year,as_of desc);
+
+
+-- Listings rejected by strict identity/FX validation are retained for audit but never affect pricing.
+create table if not exists marketplace_quarantine (
+  id bigserial primary key,
+  source_key text not null,
+  source_listing_id text,
+  source_url text,
+  reference text,
+  title text,
+  reasons jsonb not null default '[]'::jsonb,
+  payload jsonb not null default '{}'::jsonb,
+  first_seen_at timestamptz not null default now(),
+  last_seen_at timestamptz not null default now()
+);
+create unique index if not exists marketplace_quarantine_source_id_uidx
+  on marketplace_quarantine(source_key,source_listing_id)
+  where source_listing_id is not null;
+create index if not exists marketplace_quarantine_reference_idx
+  on marketplace_quarantine(reference,last_seen_at desc);
