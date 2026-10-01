@@ -281,6 +281,42 @@ async function syncMarketplaceSourceRegistry(){
   return {written:4};
 }
 
+
+async function syncVerifiedMarketplaceSeed(){
+  return logRun('verified_marketplace_seed',async()=>{
+    const rules=JSON.parse(await fs.readFile(new URL('./market/variant-rules.json',import.meta.url),'utf8'));
+    const rows=JSON.parse(await fs.readFile(new URL('./market/verified-marketplace-listings.json',import.meta.url),'utf8'));
+    let seen=0,written=0,rejected=0;
+    for(const raw of rows){
+      seen++;
+      const normalized=normalizeMarketplaceListing(raw,rules);
+      if(!normalized.accepted){rejected++;continue;}
+      const l=normalized.listing;
+      const {rows:[watch]}=await pool.query('select id from watches where lower(reference)=lower($1) limit 1',[l.reference]);
+      if(!watch){rejected++;continue;}
+      const {rows:[variant]}=await pool.query('select id from watch_variants where watch_id=$1 and lower(variant_key)=lower($2) limit 1',[watch.id,l.variant_key]);
+      if(!variant){rejected++;continue;}
+      const fx=await currentIlsRate(l.currency);
+      const priceIls=Math.round(Number(l.asking_price)*fx.rate*100)/100;
+      await pool.query(`
+        insert into marketplace_listings(
+          watch_id,variant_id,source_key,source_listing_id,source_url,title,asking_price,currency,price_ils,
+          year,bracelet,condition,full_set,country,seller_type,captured_at,is_active,metadata
+        ) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,now(),true,$16::jsonb)
+        on conflict(source_key,source_listing_id) where source_listing_id is not null do update set
+          watch_id=excluded.watch_id,variant_id=excluded.variant_id,source_url=excluded.source_url,title=excluded.title,
+          asking_price=excluded.asking_price,currency=excluded.currency,price_ils=excluded.price_ils,
+          year=excluded.year,bracelet=excluded.bracelet,condition=excluded.condition,full_set=excluded.full_set,
+          country=excluded.country,seller_type=excluded.seller_type,captured_at=now(),is_active=true,metadata=excluded.metadata
+      `,[watch.id,variant.id,l.source_key,l.source_listing_id,l.source_url,l.title,l.asking_price,l.currency,priceIls,
+          l.year,l.bracelet,l.condition||null,l.full_set??null,l.country||null,l.seller_type||null,
+          JSON.stringify({...l.metadata,verified_public_seed:true,verified_at:raw.verified_at||null,fx})]);
+      written++;
+    }
+    return {seen,written,rejected};
+  });
+}
+
 async function ingestEbayMarketplace(){
   return logRun('ebay_marketplace_ingest',async()=>{
     const rules=JSON.parse(await fs.readFile(new URL('./market/variant-rules.json',import.meta.url),'utf8'));
@@ -498,6 +534,7 @@ async function main(){
   await syncCoreVariants();
   await syncMarketplaceSourceRegistry();
   await sourceFreshnessHeartbeat('phillips_auction',syncVerifiedObservations);
+  await syncVerifiedMarketplaceSeed();
   await sourceFreshnessHeartbeat('ebay_market',ingestEbayMarketplace);
   await syncVerifiedRetailPrices();
   await calculateWatchValueEstimates();
