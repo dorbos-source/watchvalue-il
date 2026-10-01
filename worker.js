@@ -289,7 +289,11 @@ async function syncVerifiedMarketplaceSeed(){
     let seen=0,written=0,rejected=0;
     for(const raw of rows){
       seen++;
-      const normalized=normalizeMarketplaceListing(raw,rules);
+      const {rows:catalogVariants}=await pool.query(
+        'select variant_key,nickname,dial,bracelet,bezel,material from watch_variants v join watches w on w.id=v.watch_id where lower(w.reference)=lower($1)',
+        [raw.reference]
+      );
+      const normalized=normalizeMarketplaceListing(raw,rules,catalogVariants);
       if(!normalized.accepted){rejected++;continue;}
       const l=normalized.listing;
       const {rows:[watch]}=await pool.query('select id from watches where lower(reference)=lower($1) limit 1',[l.reference]);
@@ -332,7 +336,11 @@ async function ingestEbayMarketplace(){
       if(!result.enabled) return {seen,written,rejected,skipped:true,reason:result.reason};
       for(const raw of result.items){
         seen++;
-        const normalized=normalizeMarketplaceListing({...raw,reference},rules);
+        const {rows:catalogVariants}=await pool.query(
+          'select variant_key,nickname,dial,bracelet,bezel,material from watch_variants v join watches w on w.id=v.watch_id where lower(w.reference)=lower($1)',
+          [reference]
+        );
+        const normalized=normalizeMarketplaceListing({...raw,reference},rules,catalogVariants);
         if(!normalized.accepted){
           rejected++;
           await pool.query(`
