@@ -197,14 +197,17 @@ app.get('/api/project-memory', async (_req, res) => {
 
 app.get('/api/system/status', async (_req,res)=>{
   if(!pool) return res.status(503).json({ok:false});
-  const [catalog,prices,sources,runs,tasks,market,estimates]=await Promise.all([
+  const [catalog,prices,sources,runs,tasks,market,estimates,marketplace,quarantine,yearly]=await Promise.all([
     pool.query("select count(*)::int as watches,count(distinct brand_id)::int as brands from watches"),
     pool.query("select count(*)::int as snapshots,count(*) filter(where is_demo)::int as demo_snapshots,max(as_of) as latest_price_at from price_snapshots"),
     pool.query("select count(*)::int as sources,count(*) filter(where enabled)::int as enabled_sources from source_registry"),
     pool.query("select id,job_type,status,started_at,finished_at,records_seen,records_written,error from ingestion_runs order by started_at desc limit 5"),
     pool.query("select status,count(*)::int as count from agent_tasks group by status order by status"),
     pool.query("select count(*)::int as observations,count(*) filter(where is_verified)::int as verified_observations,max(observed_at) as latest_observation_at from market_observations"),
-    pool.query("select count(*)::int as estimates,count(*) filter(where is_demo)::int as demo_estimates,max(as_of) as latest_estimate_at from watchvalue_estimates")
+    pool.query("select count(*)::int as estimates,count(*) filter(where is_demo)::int as demo_estimates,max(as_of) as latest_estimate_at from watchvalue_estimates"),
+    pool.query("select count(*)::int as listings,count(distinct source_key)::int as source_count,count(distinct (watch_id,variant_id,year))::int as identity_groups,max(captured_at) as latest_listing_at from marketplace_listings where is_active=true"),
+    pool.query("select count(*)::int as quarantined,max(last_seen_at) as latest_quarantine_at from marketplace_quarantine"),
+    pool.query("select count(*)::int as yearly_prices,max(as_of) as latest_yearly_price_at from yearly_market_prices")
   ]);
   res.json({
     ok:true,
@@ -214,7 +217,10 @@ app.get('/api/system/status', async (_req,res)=>{
     recentRuns:runs.rows,
     tasks:tasks.rows,
     market:market.rows[0],
-    estimates:estimates.rows[0]
+    estimates:estimates.rows[0],
+    marketplace:marketplace.rows[0],
+    quarantine:quarantine.rows[0],
+    yearly:yearly.rows[0]
   });
 });
 
