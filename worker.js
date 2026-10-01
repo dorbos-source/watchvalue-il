@@ -260,6 +260,45 @@ async function calculateWatchValueEstimates(){
   });
 }
 
+async function calculateYearlyMarketplacePrices(){
+  return logRun('yearly_marketplace_price',async()=>{
+    const {rows:groups}=await pool.query(`
+      select watch_id,variant_id,year,
+             count(*)::int as listing_count,
+             count(distinct source_key)::int as source_count
+      from marketplace_listings
+      where is_active=true and price_ils>0 and year is not null and variant_id is not null
+      group by watch_id,variant_id,year
+    `);
+    let written=0,skipped=0;
+    for(const g of groups){
+      const {rows}=await pool.query(`
+        select price_ils,source_key from marketplace_listings
+        where watch_id=$1 and variant_id=$2 and year=$3 and is_active=true and price_ils>0
+        order by price_ils
+      `,[g.watch_id,g.variant_id,g.year]);
+      const sources=new Set(rows.map(r=>r.source_key).filter(Boolean)).size;
+      if(rows.length<3 || sources<2){skipped++;continue;}
+      const values=rows.map(r=>Number(r.price_ils)).sort((a,b)=>a-b);
+      const median=values.length%2?values[(values.length-1)/2]:(values[values.length/2-1]+values[values.length/2])/2;
+      const q1=values[Math.floor((values.length-1)*0.25)];
+      const q3=values[Math.floor((values.length-1)*0.75)];
+      const iqr=q3-q1;
+      const clean=values.filter(v=>v>=q1-1.5*iqr && v<=q3+1.5*iqr);
+      if(clean.length<3){skipped++;continue;}
+      const value=clean.length%2?clean[(clean.length-1)/2]:(clean[clean.length/2-1]+clean[clean.length/2])/2;
+      const low=clean[0],high=clean[clean.length-1];
+      await pool.query(`
+        insert into yearly_market_prices(watch_id,variant_id,year,market_price_ils,low_ils,high_ils,listing_count,source_count,methodology_version,details)
+        values($1,$2,$3,$4,$5,$6,$7,$8,'marketplace-median-v1',$9::jsonb)
+      `,[g.watch_id,g.variant_id,g.year,Math.round(value),Math.round(low),Math.round(high),clean.length,sources,
+          JSON.stringify({requiredIdentity:['reference','variant_key','year','bracelet'],outlierRule:'1.5x IQR',sourceMinimum:2,listingMinimum:3})]);
+      written++;
+    }
+    return {seen:groups.length,written,skipped};
+  });
+}
+
 async function processQueue(){
   let processed=0;
   let ranQualityScan=false;
@@ -367,6 +406,7 @@ async function main(){
   await sourceFreshnessHeartbeat('phillips_auction',syncVerifiedObservations);
   await syncVerifiedRetailPrices();
   await calculateWatchValueEstimates();
+  await calculateYearlyMarketplacePrices();
   const queue=await processQueue();
   if(!queue.ranQualityScan) await catalogQualityScan();
   console.log('WatchValue worker completed', queue);
