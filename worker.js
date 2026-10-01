@@ -290,7 +290,7 @@ async function syncVerifiedMarketplaceSeed(){
     for(const raw of rows){
       seen++;
       const {rows:catalogVariants}=await pool.query(
-        'select variant_key,nickname,dial,bracelet,bezel,material from watch_variants v join watches w on w.id=v.watch_id where lower(w.reference)=lower($1)',
+        'select v.variant_key,v.nickname,v.dial,v.bracelet,v.bezel,v.material from watch_variants v join watches w on w.id=v.watch_id where lower(w.reference)=lower($1)',
         [raw.reference]
       );
       const normalized=normalizeMarketplaceListing(raw,rules,catalogVariants);
