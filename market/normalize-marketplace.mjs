@@ -1,3 +1,4 @@
+import { resolveVariantFingerprint } from './variant-fingerprint.mjs';
 const YEAR_RE=/\b(19[5-9]\d|20[0-3]\d)\b/g;
 const norm=s=>String(s||'').trim();
 const upper=s=>norm(s).toUpperCase().replace(/[^A-Z0-9]/g,'');
@@ -39,11 +40,14 @@ export function resolveStrictVariant({reference,variant_key,bracelet,title},rule
   return {variant_key:matches[0].variant_key,bracelet:br};
 }
 
-export function normalizeMarketplaceListing(input,rules){
+export function normalizeMarketplaceListing(input,rules,catalogVariants=[]){
   const reference=norm(input.reference);
   const title=norm(input.title);
   const year=extractYear(input.year,title);
-  const resolved=resolveStrictVariant({...input,reference,title},rules);
+  let resolved=resolveStrictVariant({...input,reference,title},rules);
+  if(!resolved.variant_key && catalogVariants.length){
+    resolved=resolveVariantFingerprint({...input,reference,title},catalogVariants);
+  }
   const price=Number(input.asking_price);
   const currency=norm(input.currency).toUpperCase();
   const source_url=norm(input.source_url);
@@ -62,6 +66,11 @@ export function normalizeMarketplaceListing(input,rules){
       ...input,reference,title,year,
       variant_key:resolved.variant_key,
       bracelet:resolved.bracelet,
+      dial:resolved.dial||input.dial||null,
+      bezel:resolved.bezel||input.bezel||null,
+      material:resolved.material||input.material||null,
+      identity_confidence:resolved.confidence??null,
+      identity_matched_by:resolved.matchedBy||null,
       asking_price:price,
       currency,
       source_url
