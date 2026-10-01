@@ -386,3 +386,24 @@ create unique index if not exists marketplace_quarantine_source_id_uidx
   where source_listing_id is not null;
 create index if not exists marketplace_quarantine_reference_idx
   on marketplace_quarantine(reference,last_seen_at desc);
+
+
+-- Market heat is deliberately separate from configuration identity.
+create table if not exists market_heat_metrics (
+  id bigserial primary key,
+  watch_id bigint not null references watches(id) on delete cascade,
+  variant_id bigint references watch_variants(id) on delete cascade,
+  year int,
+  as_of timestamptz not null default now(),
+  active_listing_count int,
+  source_count int,
+  listing_velocity_7d numeric(12,4),
+  premium_to_retail_pct numeric(10,2),
+  median_days_on_market numeric(10,2),
+  search_interest_score numeric(8,2),
+  hype_score numeric(8,2),
+  methodology_version text not null default 'heat-v1',
+  details jsonb not null default '{}'::jsonb
+);
+create index if not exists market_heat_variant_time_idx
+  on market_heat_metrics(variant_id,year,as_of desc);
