@@ -1,5 +1,8 @@
 import pg from 'pg';
 import fs from 'fs/promises';
+import { normalizeMarketplaceListing } from './market/normalize-marketplace.mjs';
+import { searchEbay } from './market/adapters/ebay.mjs';
+import { currentIlsRate } from './market/fx-current.mjs';
 
 const { Pool } = pg;
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -260,6 +263,96 @@ async function calculateWatchValueEstimates(){
   });
 }
 
+
+async function syncMarketplaceSourceRegistry(){
+  await pool.query(`
+    insert into source_registry(source_key,name,source_type,base_url,enabled,usage_mode,notes,last_checked_at) values
+    ('ebay_market','eBay','marketplace','https://www.ebay.com',true,'official_api',
+     'Official eBay Buy Browse API. Listings are accepted only with strict reference + variant + year + bracelet identity.',now()),
+    ('chrono24_market','Chrono24','marketplace','https://www.chrono24.com',false,'research_only',
+     'Large asking-price marketplace. Disabled for automated ingestion until an approved access method is configured.',now()),
+    ('watchfinder_market','Watchfinder','dealer','https://www.watchfinder.com',false,'research_only',
+     'Dealer inventory used for cross-check research; automated ingestion disabled until access policy is approved.',now()),
+    ('bobs_market','Bob''s Watches','dealer','https://www.bobswatches.com',false,'research_only',
+     'Dealer and historical transaction research source; automated ingestion disabled until access policy is approved.',now())
+    on conflict(source_key) do update set name=excluded.name,source_type=excluded.source_type,
+      base_url=excluded.base_url,usage_mode=excluded.usage_mode,notes=excluded.notes,last_checked_at=now()
+  `);
+  return {written:4};
+}
+
+async function ingestEbayMarketplace(){
+  return logRun('ebay_marketplace_ingest',async()=>{
+    const rules=JSON.parse(await fs.readFile(new URL('./market/variant-rules.json',import.meta.url),'utf8'));
+    const refs=Object.values(rules).filter(Array.isArray).flat().map(x=>x.reference).filter(Boolean);
+    let seen=0,written=0,rejected=0;
+    for(const reference of refs){
+      const result=await searchEbay({
+        clientId:process.env.EBAY_CLIENT_ID,
+        clientSecret:process.env.EBAY_CLIENT_SECRET,
+        reference,
+        limit:Number(process.env.EBAY_SEARCH_LIMIT||200)
+      });
+      if(!result.enabled) return {seen,written,rejected,skipped:true,reason:result.reason};
+      for(const raw of result.items){
+        seen++;
+        const normalized=normalizeMarketplaceListing({...raw,reference},rules);
+        if(!normalized.accepted){
+          rejected++;
+          await pool.query(`
+            insert into marketplace_quarantine(source_key,source_listing_id,source_url,reference,title,reasons,payload,last_seen_at)
+            values($1,$2,$3,$4,$5,$6::jsonb,$7::jsonb,now())
+            on conflict(source_key,source_listing_id) where source_listing_id is not null
+            do update set source_url=excluded.source_url,reference=excluded.reference,title=excluded.title,
+              reasons=excluded.reasons,payload=excluded.payload,last_seen_at=now()
+          `,[raw.source_key,raw.source_listing_id,raw.source_url||null,reference,raw.title||null,
+              JSON.stringify(normalized.reasons),JSON.stringify(raw)]);
+          continue;
+        }
+        const l=normalized.listing;
+        const {rows:[watch]}=await pool.query('select id from watches where lower(reference)=lower($1) limit 1',[l.reference]);
+        if(!watch){rejected++;continue;}
+        const {rows:[variant]}=await pool.query(
+          'select id from watch_variants where watch_id=$1 and lower(variant_key)=lower($2) limit 1',
+          [watch.id,l.variant_key]
+        );
+        if(!variant){rejected++;continue;}
+        let priceIls=null,fxMeta=null;
+        try{
+          const fx=await currentIlsRate(l.currency);
+          priceIls=Math.round(Number(l.asking_price)*fx.rate*100)/100;
+          fxMeta=fx;
+        }catch(error){
+          rejected++;
+          await pool.query(`
+            insert into marketplace_quarantine(source_key,source_listing_id,source_url,reference,title,reasons,payload,last_seen_at)
+            values($1,$2,$3,$4,$5,$6::jsonb,$7::jsonb,now())
+            on conflict(source_key,source_listing_id) where source_listing_id is not null
+            do update set reasons=excluded.reasons,payload=excluded.payload,last_seen_at=now()
+          `,[l.source_key,l.source_listing_id,l.source_url,l.reference,l.title,
+              JSON.stringify(['fx_unavailable']),JSON.stringify({...raw,fx_error:String(error?.message||error)})]);
+          continue;
+        }
+        await pool.query(`
+          insert into marketplace_listings(
+            watch_id,variant_id,source_key,source_listing_id,source_url,title,asking_price,currency,price_ils,
+            year,bracelet,condition,full_set,country,seller_type,captured_at,is_active,metadata
+          ) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,now(),true,$16::jsonb)
+          on conflict(source_key,source_listing_id) where source_listing_id is not null do update set
+            watch_id=excluded.watch_id,variant_id=excluded.variant_id,source_url=excluded.source_url,title=excluded.title,
+            asking_price=excluded.asking_price,currency=excluded.currency,price_ils=excluded.price_ils,
+            year=excluded.year,bracelet=excluded.bracelet,condition=excluded.condition,country=excluded.country,
+            seller_type=excluded.seller_type,captured_at=now(),is_active=true,metadata=excluded.metadata
+        `,[watch.id,variant.id,l.source_key,l.source_listing_id,l.source_url,l.title,l.asking_price,l.currency,priceIls,
+            l.year,l.bracelet,l.condition||null,l.full_set??null,l.country||null,l.seller_type||null,
+            JSON.stringify({...l.metadata,fx:fxMeta,identity:{reference:l.reference,variant_key:l.variant_key,year:l.year,bracelet:l.bracelet}})]);
+        written++;
+      }
+    }
+    return {seen,written,rejected,references:refs.length};
+  });
+}
+
 async function calculateYearlyMarketplacePrices(){
   return logRun('yearly_marketplace_price',async()=>{
     const {rows:groups}=await pool.query(`
@@ -403,7 +496,9 @@ async function main(){
   await enqueueAgentPipeline();
   await syncCoreCatalog();
   await syncCoreVariants();
+  await syncMarketplaceSourceRegistry();
   await sourceFreshnessHeartbeat('phillips_auction',syncVerifiedObservations);
+  await sourceFreshnessHeartbeat('ebay_market',ingestEbayMarketplace);
   await syncVerifiedRetailPrices();
   await calculateWatchValueEstimates();
   await calculateYearlyMarketplacePrices();
