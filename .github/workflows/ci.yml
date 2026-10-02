@@ -28,12 +28,21 @@ jobs:
           node --check app.js
           node --check catalog/import-catalog.js
           node --check qa/validate-catalog.mjs
+          node --check qa/validate-marketplace.mjs
+          node --check market/normalize-marketplace.mjs
+          node --check market/variant-fingerprint.mjs
 
       - name: JSON parse
         run: |
           node -e "JSON.parse(require('fs').readFileSync('catalog/core-references.json','utf8'))"
           node -e "JSON.parse(require('fs').readFileSync('catalog/core-variants.json','utf8'))"
           node -e "JSON.parse(require('fs').readFileSync('market/verified-observations.json','utf8'))"
+          node -e "JSON.parse(require('fs').readFileSync('market/verified-marketplace-listings.json','utf8'))"
+          node -e "JSON.parse(require('fs').readFileSync('market/verified-retail-prices.json','utf8'))"
+          node -e "JSON.parse(require('fs').readFileSync('market/variant-rules.json','utf8'))"
 
       - name: Catalog and provenance QA
         run: node qa/validate-catalog.mjs
+
+      - name: Marketplace identity QA
+        run: node qa/validate-marketplace.mjs
